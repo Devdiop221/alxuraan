@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, SafeAreaView } from "react-native";
+import { SafeAreaView, View } from 'react-native';
 
+import { CustomButton } from '../components/ui/Button';
+import { Colors } from '../components/ui/Colors';
+import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
+import { CustomText } from '../components/ui/Typography';
 import { useTheme } from '../context/ThemeContext';
 import { getAyaTranslation } from '../services/quranService';
 import useStore from '../store/store';
-
-// Importation des composants personnalisés
-import { CustomButton } from "../components/ui/Button";
-import { CustomText } from "../components/ui/Typography";
-import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
-import { Colors } from "../components/ui/Colors";
 
 export default function AyaDetailScreen({ route }) {
   const { suraNumber, ayaNumber } = route.params;
@@ -49,11 +47,12 @@ export default function AyaDetailScreen({ route }) {
   }
 
   return (
-    <SafeAreaView style={{
-      flex: 1,
-      padding: 16,
-      backgroundColor: theme === 'dark' ? Colors.background : Colors.background
-    }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 16,
+        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+      }}>
       <CustomText
         fontSize={24}
         fontWeight="bold"
@@ -70,7 +69,10 @@ export default function AyaDetailScreen({ route }) {
             color={theme === 'dark' ? Colors.text : Colors.text}>
             {aya.arabic_text}
           </CustomText>
-          <CustomText fontSize={18} marginBottom={16} color={theme === 'dark' ? Colors.text : Colors.text}>
+          <CustomText
+            fontSize={18}
+            marginBottom={16}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             {aya.translation}
           </CustomText>
           <CustomButton

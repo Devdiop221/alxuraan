@@ -1,15 +1,13 @@
 import { Search, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, View, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
+import { FlatList, View, TextInput, TouchableOpacity, SafeAreaView } from 'react-native';
 
+import { Colors } from '../components/ui/Colors';
+import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
+import { CustomText } from '../components/ui/Typography';
 import { useTheme } from '../context/ThemeContext';
 import { getSuraNames } from '../services/quranService';
 
-// Importation des composants personnalisés
-import { CustomButton } from "../components/ui/Button";
-import { CustomText } from "../components/ui/Typography";
-import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
-import { Colors } from "../components/ui/Colors";
 
 const PAGE_SIZE = 10;
 
@@ -80,8 +78,21 @@ export default function QuranScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? Colors.background : Colors.background }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.gray200, borderRadius: 8, padding: 8, marginBottom: 16 }}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 16,
+        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          backgroundColor: Colors.gray200,
+          borderRadius: 8,
+          padding: 8,
+          marginBottom: 16,
+        }}>
         <Search size={20} color={theme === 'dark' ? Colors.white : Colors.black} />
         <TextInput
           placeholder="Rechercher une sourate..."
@@ -103,9 +114,17 @@ export default function QuranScreen({ navigation }) {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => handleSuraPress(item)}
-            style={{ padding: 16, marginBottom: 8, borderRadius: 8, backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200 }}>
+            style={{
+              padding: 16,
+              marginBottom: 8,
+              borderRadius: 8,
+              backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200,
+            }}>
             <View>
-              <CustomText size="lg" weight="bold" color={theme === 'dark' ? Colors.white : Colors.black}>
+              <CustomText
+                size="lg"
+                weight="bold"
+                color={theme === 'dark' ? Colors.white : Colors.black}>
                 {item.id}. {item.name_fr} ({item.name_ar})
               </CustomText>
               <CustomText size="sm" color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>

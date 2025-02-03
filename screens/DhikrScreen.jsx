@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { SafeAreaView, View } from "react-native";
-import { useTheme } from '../context/ThemeContext';
+import { SafeAreaView } from 'react-native';
 
-// Importation des composants personnalisés
-import { CustomButton } from "../components/ui/Button";
-import { CustomText } from "../components/ui/Typography";
-import { Colors } from "../components/ui/Colors";
+
+import { CustomButton } from '../components/ui/Button';
+import { Colors } from '../components/ui/Colors';
+import { CustomText } from '../components/ui/Typography';
+import { useTheme } from '../context/ThemeContext';
 
 export default function DhikrScreen() {
   const { theme } = useTheme();
@@ -20,22 +20,29 @@ export default function DhikrScreen() {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? Colors.background : Colors.background }}>
-      <CustomText size="2xl" weight="bold" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 16,
+        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+      }}>
+      <CustomText
+        size="2xl"
+        weight="bold"
+        style={{ marginBottom: 16 }}
+        color={theme === 'dark' ? Colors.text : Colors.text}>
         Compteur de Dhikr
       </CustomText>
-      <CustomText size="6xl" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
+      <CustomText
+        size="6xl"
+        style={{ marginBottom: 16 }}
+        color={theme === 'dark' ? Colors.text : Colors.text}>
         {dhikrCount}
       </CustomText>
-      <CustomButton
-        onPress={handleDhikr}
-        variant="primary"
-        style={{ marginBottom: 16 }}>
+      <CustomButton onPress={handleDhikr} variant="primary" style={{ marginBottom: 16 }}>
         Faire un Dhikr
       </CustomButton>
-      <CustomButton
-        onPress={resetDhikr}
-        variant="secondary">
+      <CustomButton onPress={resetDhikr} variant="secondary">
         Réinitialiser
       </CustomButton>
     </SafeAreaView>

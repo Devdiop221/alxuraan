@@ -1,12 +1,11 @@
 import React from 'react';
-import { FlatList, View, TouchableOpacity, SafeAreaView } from "react-native";
+import { FlatList, TouchableOpacity, SafeAreaView } from 'react-native';
 
+import { Colors } from '../components/ui/Colors';
+import { CustomText } from '../components/ui/Typography';
 import { useTheme } from '../context/ThemeContext';
 import useStore from '../store/store';
 
-// Importation des composants personnalisés
-import { CustomText } from "../components/ui/Typography";
-import { Colors } from "../components/ui/Colors";
 
 export default function FavoritesScreen({ navigation }) {
   const { theme } = useTheme();
@@ -17,8 +16,17 @@ export default function FavoritesScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? Colors.background : Colors.background }}>
-      <CustomText size="2xl" weight="bold" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 16,
+        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+      }}>
+      <CustomText
+        size="2xl"
+        weight="bold"
+        style={{ marginBottom: 16 }}
+        color={theme === 'dark' ? Colors.text : Colors.text}>
         Mes Favoris
       </CustomText>
       {favorites.length === 0 ? (
@@ -31,7 +39,12 @@ export default function FavoritesScreen({ navigation }) {
           keyExtractor={(item) => `${item.suraNumber}-${item.ayaNumber}`}
           renderItem={({ item }) => (
             <TouchableOpacity
-              style={{ borderRadius: 8, padding: 16, marginBottom: 8, backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200 }}
+              style={{
+                borderRadius: 8,
+                padding: 16,
+                marginBottom: 8,
+                backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200,
+              }}
               onPress={() => handleAyaPress(item.suraNumber, item.ayaNumber)}>
               <CustomText size="lg" color={theme === 'dark' ? Colors.white : Colors.black}>
                 Sourate {item.suraNumber}, Verset {item.ayaNumber}

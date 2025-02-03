@@ -1,4 +1,3 @@
-import { Bookmark, Headphones } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { ScrollView, View, SafeAreaView } from 'react-native';
 
@@ -8,8 +7,6 @@ import { CustomText } from '../components/ui/Typography';
 import { useTheme } from '../context/ThemeContext';
 import wolofData from '../data/quran_wolof.json';
 import { getSuraTranslation } from '../services/quranService';
-
-// Importation des composants personnalisés
 
 export default function SourateDetail({ route }) {
   const { suraNumber, suraNameAr, suraNameFr } = route.params;

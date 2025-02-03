@@ -1,13 +1,13 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { FlatList, SafeAreaView, View , Alert} from "react-native";
+import { FlatList, SafeAreaView, View, Alert } from 'react-native';
 
-// Importation des composants personnalisés
-import { CustomButton } from "../components/ui/Button";
-import { CustomCard } from "../components/ui/Card";
-import { Colors } from "../components/ui/Colors";
-import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
-import { CustomText } from "../components/ui/Typography";
+
+import { CustomButton } from '../components/ui/Button';
+import { CustomCard } from '../components/ui/Card';
+import { Colors } from '../components/ui/Colors';
+import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
+import { CustomText } from '../components/ui/Typography';
 
 export default function SurahsScreen({ route, navigation }) {
   const { edition } = route.params;
@@ -60,9 +60,12 @@ export default function SurahsScreen({ route, navigation }) {
     const handleAudioError = (error) => {
       console.error('Error loading audio:', error);
       if (error.code === -1100) {
-        Alert.alert("Erreur", "L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer.");
+        Alert.alert(
+          'Erreur',
+          "L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer."
+        );
       } else {
-        Alert.alert("Erreur", "Erreur lors du chargement de l'audio. Veuillez réessayer.");
+        Alert.alert('Erreur', "Erreur lors du chargement de l'audio. Veuillez réessayer.");
       }
     };
 

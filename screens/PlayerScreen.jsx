@@ -1,14 +1,13 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
 import React, { useState, useEffect } from 'react';
-import { Alert, SafeAreaView, View } from "react-native";
-import Slider from '@react-native-community/slider';
+import { Alert, SafeAreaView, View } from 'react-native';
 
-// Importation des composants personnalisés
-import { CustomButton } from "../components/ui/Button";
-import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
-import { CustomText } from "../components/ui/Typography";
-import { Colors } from "../components/ui/Colors";
+import { CustomButton } from '../components/ui/Button';
+import { Colors } from '../components/ui/Colors';
+import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
+import { CustomText } from '../components/ui/Typography';
 
 export default function PlayerScreen({ route, navigation }) {
   const { audioUrl, surahName, surahNumber } = route.params;
@@ -46,7 +45,9 @@ export default function PlayerScreen({ route, navigation }) {
       } catch (error) {
         console.error('Error loading audio:', error);
         if (error.code === -1100) {
-          setError("L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer.");
+          setError(
+            "L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer."
+          );
         } else {
           setError("Erreur lors du chargement de l'audio. Veuillez réessayer.");
         }
