@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, View, Text } from 'react-native';
+import { SafeAreaView, View } from 'react-native';
 
+import { CustomButton } from '../components/ui/Button';
+import { Colors } from '../components/ui/Colors';
+import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
+import { CustomText } from '../components/ui/Typography';
 import { useTheme } from '../context/ThemeContext';
 import {
   getPrayerTimes,
@@ -8,6 +12,8 @@ import {
   getUserLocation,
   getPrayerTimesByCoords,
 } from '../services/prayerTimesService';
+
+// Importation des composants personnalisés
 
 export default function PrayerTimesScreen() {
   const { theme } = useTheme();
@@ -31,33 +37,57 @@ export default function PrayerTimesScreen() {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" />;
+    return <CustomLoadingIndicator />;
   }
 
   return (
-    <View className={`flex-1 p-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-      <Text className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        padding: 16,
+        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+      }}>
+      <CustomText
+        size="2xl"
+        weight="bold"
+        style={{ marginBottom: 16 }}
+        color={theme === 'dark' ? Colors.text : Colors.text}>
         Horaires de Prière
-      </Text>
+      </CustomText>
       {prayerTimes && (
         <View>
-          <Text className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          <CustomText
+            size="lg"
+            style={{ marginBottom: 8 }}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             Fajr: {prayerTimes.Fajr}
-          </Text>
-          <Text className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          </CustomText>
+          <CustomText
+            size="lg"
+            style={{ marginBottom: 8 }}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             Dhuhr: {prayerTimes.Dhuhr}
-          </Text>
-          <Text className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          </CustomText>
+          <CustomText
+            size="lg"
+            style={{ marginBottom: 8 }}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             Asr: {prayerTimes.Asr}
-          </Text>
-          <Text className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          </CustomText>
+          <CustomText
+            size="lg"
+            style={{ marginBottom: 8 }}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             Maghrib: {prayerTimes.Maghrib}
-          </Text>
-          <Text className={`text-lg ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+          </CustomText>
+          <CustomText
+            size="lg"
+            style={{ marginBottom: 8 }}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             Isha: {prayerTimes.Isha}
-          </Text>
+          </CustomText>
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

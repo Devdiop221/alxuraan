@@ -1,31 +1,35 @@
 import React, { useContext } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
+
+// Importation des composants personnalisés
+import { CustomText } from "../components/ui/Typography";
+import { Colors } from "../components/ui/Colors";
 
 export default function SettingsScreen() {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <View className={`flex-1 justify-center items-center ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-      <Text className={`text-2xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme === 'dark' ? Colors.background : Colors.background }}>
+      <CustomText size="2xl" weight="bold" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
         Thème actuel : {theme}
-      </Text>
+      </CustomText>
       <TouchableOpacity
         onPress={toggleTheme}
-        className="mt-5 p-3 bg-blue-500 rounded-lg">
-        <Text className="text-white">Basculer le thème</Text>
+        style={{ marginTop: 20, padding: 12, backgroundColor: Colors.primary, borderRadius: 8 }}>
+        <CustomText color={Colors.background}>Basculer le thème</CustomText>
       </TouchableOpacity>
 
       {/* Additional user account settings */}
-      <View className="mt-10 w-full px-4">
-        <Text className={`text-xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+      <View style={{ marginTop: 40, width: '100%', paddingHorizontal: 16 }}>
+        <CustomText size="xl" weight="bold" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
           Paramètres du compte
-        </Text>
-        <TouchableOpacity className="mt-3 p-3 bg-green-500 rounded-lg">
-          <Text className="text-white">Modifier le profil</Text>
+        </CustomText>
+        <TouchableOpacity style={{ marginTop: 12, padding: 12, backgroundColor: Colors.success, borderRadius: 8 }}>
+          <CustomText color={Colors.background}>Modifier le profil</CustomText>
         </TouchableOpacity>
-        <TouchableOpacity className="mt-3 p-3 bg-red-500 rounded-lg">
-          <Text className="text-white">Déconnexion</Text>
+        <TouchableOpacity style={{ marginTop: 12, padding: 12, backgroundColor: Colors.error, borderRadius: 8 }}>
+          <CustomText color={Colors.background}>Déconnexion</CustomText>
         </TouchableOpacity>
       </View>
     </View>

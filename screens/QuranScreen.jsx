@@ -1,9 +1,15 @@
 import { Search, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, ActivityIndicator, View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { FlatList, View, TextInput, TouchableOpacity, SafeAreaView } from "react-native";
 
 import { useTheme } from '../context/ThemeContext';
 import { getSuraNames } from '../services/quranService';
+
+// Importation des composants personnalisés
+import { CustomButton } from "../components/ui/Button";
+import { CustomText } from "../components/ui/Typography";
+import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
+import { Colors } from "../components/ui/Colors";
 
 const PAGE_SIZE = 10;
 
@@ -74,20 +80,19 @@ export default function QuranScreen({ navigation }) {
   };
 
   return (
-    <View className={`flex-1 p-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-      <View className="flex-row items-center bg-gray-200 rounded-lg p-2 mb-4">
-        <Search size={20} color={theme === 'dark' ? '#fff' : '#000'} />
+    <SafeAreaView style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? Colors.background : Colors.background }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', backgroundColor: Colors.gray200, borderRadius: 8, padding: 8, marginBottom: 16 }}>
+        <Search size={20} color={theme === 'dark' ? Colors.white : Colors.black} />
         <TextInput
           placeholder="Rechercher une sourate..."
-          placeholderTextColor={theme === 'dark' ? '#9ca3af' : '#6b7280'}
+          placeholderTextColor={theme === 'dark' ? Colors.gray400 : Colors.gray600}
           value={searchQuery}
           onChangeText={setSearchQuery}
-          className="flex-1 ml-2"
-          style={{ color: theme === 'dark' ? '#fff' : '#000' }}
+          style={{ flex: 1, marginLeft: 8, color: theme === 'dark' ? Colors.white : Colors.black }}
         />
         {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')} className="p-2">
-            <X size={20} color={theme === 'dark' ? '#fff' : '#000'} />
+          <TouchableOpacity onPress={() => setSearchQuery('')} style={{ padding: 8 }}>
+            <X size={20} color={theme === 'dark' ? Colors.white : Colors.black} />
           </TouchableOpacity>
         )}
       </View>
@@ -98,21 +103,21 @@ export default function QuranScreen({ navigation }) {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => handleSuraPress(item)}
-            className={`p-4 mb-2 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'}`}>
+            style={{ padding: 16, marginBottom: 8, borderRadius: 8, backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200 }}>
             <View>
-              <Text className={`text-lg font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+              <CustomText size="lg" weight="bold" color={theme === 'dark' ? Colors.white : Colors.black}>
                 {item.id}. {item.name_fr} ({item.name_ar})
-              </Text>
-              <Text className={`text-sm ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+              </CustomText>
+              <CustomText size="sm" color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
                 {item.verses} versets
-              </Text>
+              </CustomText>
             </View>
           </TouchableOpacity>
         )}
         onEndReached={loadSourates}
         onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator size="large" /> : null}
+        ListFooterComponent={loading ? <CustomLoadingIndicator /> : null}
       />
-    </View>
+    </SafeAreaView>
   );
 }

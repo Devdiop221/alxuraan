@@ -1,6 +1,13 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { FlatList, ActivityIndicator, View, Text, TouchableOpacity } from 'react-native';
+import { FlatList, SafeAreaView, View , Alert} from "react-native";
+
+// Importation des composants personnalisés
+import { CustomButton } from "../components/ui/Button";
+import { CustomCard } from "../components/ui/Card";
+import { Colors } from "../components/ui/Colors";
+import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
+import { CustomText } from "../components/ui/Typography";
 
 export default function SurahsScreen({ route, navigation }) {
   const { edition } = route.params;
@@ -25,17 +32,24 @@ export default function SurahsScreen({ route, navigation }) {
   }, [edition]);
 
   if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
+    return <CustomLoadingIndicator />;
   }
 
   if (error) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <Text className="text-red-500">{error}</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: Colors.background,
+        }}>
+        <CustomText color="error" size="lg" weight="bold" style={{ marginBottom: 20 }}>
+          {error}
+        </CustomText>
+        <CustomButton onPress={() => navigation.goBack()} variant="primary">
+          Retour
+        </CustomButton>
       </View>
     );
   }
@@ -43,34 +57,63 @@ export default function SurahsScreen({ route, navigation }) {
   const renderSurah = ({ item }) => {
     const audioUrl = `https://cdn.islamic.network/quran/audio-surah/128/${edition}/${item.number}.mp3`;
 
+    const handleAudioError = (error) => {
+      console.error('Error loading audio:', error);
+      if (error.code === -1100) {
+        Alert.alert("Erreur", "L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer.");
+      } else {
+        Alert.alert("Erreur", "Erreur lors du chargement de l'audio. Veuillez réessayer.");
+      }
+    };
+
     return (
-      <View className="m-2 p-4 rounded-lg bg-gray-200">
-        <Text className="text-lg font-bold">
+      <CustomCard
+        style={{
+          marginVertical: 10,
+          marginHorizontal: 15,
+        }}>
+        <CustomText size="lg" weight="bold" style={{ marginBottom: 5 }}>
           {item.number}. {item.englishName}
-        </Text>
-        <Text className="text-gray-600">{item.englishNameTranslation}</Text>
-        <TouchableOpacity
+        </CustomText>
+
+        <CustomText size="md" color="textSecondary" style={{ marginBottom: 10 }}>
+          {item.englishNameTranslation}
+        </CustomText>
+
+        <CustomButton
           onPress={() => {
-            navigation.navigate('Player', {
-              audioUrl,
-              surahName: item.englishName,
-              surahNumber: item.number,
-            });
+            try {
+              navigation.navigate('Player', {
+                audioUrl,
+                surahName: item.englishName,
+                surahNumber: item.number,
+              });
+            } catch (error) {
+              handleAudioError(error);
+            }
           }}
-          className="mt-2 p-2 bg-blue-500 rounded-lg">
-          <Text className="text-white text-center">Écouter</Text>
-        </TouchableOpacity>
-      </View>
+          variant="primary">
+          Écouter
+        </CustomButton>
+      </CustomCard>
     );
   };
 
   return (
-    <View className="flex-1 bg-white">
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.background,
+      }}>
       <FlatList
         data={surahs}
         renderItem={renderSurah}
         keyExtractor={(item) => item.number.toString()}
+        contentContainerStyle={{
+          paddingTop: 10,
+          paddingBottom: 20,
+        }}
       />
-    </View>
+    </SafeAreaView>
   );
 }

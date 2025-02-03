@@ -43,6 +43,7 @@ export default function AppNavigator() {
           tabBarStyle: {
             backgroundColor: theme === 'dark' ? '#1f2937' : '#f9fafb',
           },
+          headerShown: false,
         })}
       >
         <Tab.Screen name="Qaris" component={SurashNavigator} />

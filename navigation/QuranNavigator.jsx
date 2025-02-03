@@ -17,6 +17,7 @@ export default function QuranNavigator() {
           backgroundColor: theme === 'dark' ? '#1f2937' : '#f9fafb',
         },
         headerTintColor: theme === 'dark' ? '#fff' : '#000',
+        headerShown: false,
       }}
     >
       <Stack.Screen

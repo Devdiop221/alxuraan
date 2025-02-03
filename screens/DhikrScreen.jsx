@@ -1,6 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { SafeAreaView, View } from "react-native";
 import { useTheme } from '../context/ThemeContext';
+
+// Importation des composants personnalisés
+import { CustomButton } from "../components/ui/Button";
+import { CustomText } from "../components/ui/Typography";
+import { Colors } from "../components/ui/Colors";
 
 export default function DhikrScreen() {
   const { theme } = useTheme();
@@ -15,23 +20,24 @@ export default function DhikrScreen() {
   };
 
   return (
-    <View className={`flex-1 p-4 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-      <Text className={`text-2xl font-bold mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+    <SafeAreaView style={{ flex: 1, padding: 16, backgroundColor: theme === 'dark' ? Colors.background : Colors.background }}>
+      <CustomText size="2xl" weight="bold" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
         Compteur de Dhikr
-      </Text>
-      <Text className={`text-6xl mb-4 ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
+      </CustomText>
+      <CustomText size="6xl" style={{ marginBottom: 16 }} color={theme === 'dark' ? Colors.text : Colors.text}>
         {dhikrCount}
-      </Text>
-      <TouchableOpacity
-        className="bg-blue-500 rounded-lg p-4 mb-4"
-        onPress={handleDhikr}>
-        <Text className="text-white text-center">Faire un Dhikr</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        className="bg-red-500 rounded-lg p-4"
-        onPress={resetDhikr}>
-        <Text className="text-white text-center">Réinitialiser</Text>
-      </TouchableOpacity>
-    </View>
+      </CustomText>
+      <CustomButton
+        onPress={handleDhikr}
+        variant="primary"
+        style={{ marginBottom: 16 }}>
+        Faire un Dhikr
+      </CustomButton>
+      <CustomButton
+        onPress={resetDhikr}
+        variant="secondary">
+        Réinitialiser
+      </CustomButton>
+    </SafeAreaView>
   );
 }

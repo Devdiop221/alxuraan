@@ -12,12 +12,14 @@ export default function SurashNavigator() {
 
   return (
     <Stack.Navigator
+      h
       screenOptions={{
         cardStyle: { backgroundColor: theme === 'dark' ? '#000' : '#fff' },
         headerStyle: {
           backgroundColor: theme === 'dark' ? '#1f2937' : '#f9fafb',
         },
         headerTintColor: theme === 'dark' ? '#fff' : '#000',
+        headerShown: false,
       }}
     >
       <Stack.Screen

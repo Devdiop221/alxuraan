@@ -1,10 +1,15 @@
 import { Bookmark, Headphones } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { ScrollView, ActivityIndicator, View, Text } from 'react-native';
+import { ScrollView, View, SafeAreaView } from 'react-native';
 
+import { Colors } from '../components/ui/Colors';
+import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
+import { CustomText } from '../components/ui/Typography';
 import { useTheme } from '../context/ThemeContext';
 import wolofData from '../data/quran_wolof.json';
 import { getSuraTranslation } from '../services/quranService';
+
+// Importation des composants personnalisés
 
 export default function SourateDetail({ route }) {
   const { suraNumber, suraNameAr, suraNameFr } = route.params;
@@ -39,37 +44,70 @@ export default function SourateDetail({ route }) {
   }, [suraNumber]);
 
   if (loading) {
-    return <ActivityIndicator size="large" />;
+    return <CustomLoadingIndicator />;
   }
 
   return (
-    <ScrollView className={`flex-1 ${theme === 'dark' ? 'bg-black' : 'bg-white'}`}>
-      <View className="border-b border-gray-300 p-4">
-        <Text className={`text-2xl font-bold text-center ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-          {suraName.name_ar} - {suraName.name_fr}
-        </Text>
-        <Text className={`text-lg text-center ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-          {suraName.name_wo}
-        </Text>
-      </View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.background,
+      }}>
+      <ScrollView
+        style={{
+          flex: 1,
+          backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+        }}>
+        <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.gray300, padding: 16 }}>
+          <CustomText
+            size="2xl"
+            weight="bold"
+            style={{ textAlign: 'center' }}
+            color={theme === 'dark' ? Colors.text : Colors.text}>
+            {suraName.name_ar} - {suraName.name_fr}
+          </CustomText>
+          <CustomText
+            size="lg"
+            style={{ textAlign: 'center' }}
+            color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
+            {suraName.name_wo}
+          </CustomText>
+        </View>
 
-      <View className="p-4">
-        {verses.map((verse, index) => (
-          <View
-            key={index}
-            className={`mb-4 p-4 rounded-lg ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-200'} border ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'}`}>
-            <Text className={`text-xl text-right ${theme === 'dark' ? 'text-white' : 'text-black'}`}>
-              {index + 1}. {verse.arabic_text}
-            </Text>
-            <Text className={`text-lg text-left ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-              {verse.translation}
-            </Text>
-            <Text className={`text-base text-left ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'} mt-2`}>
-              {verse.wolof}
-            </Text>
-          </View>
-        ))}
-      </View>
-    </ScrollView>
+        <View style={{ padding: 16 }}>
+          {verses.map((verse, index) => (
+            <View
+              key={index}
+              style={{
+                marginBottom: 16,
+                padding: 16,
+                borderRadius: 8,
+                backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200,
+                borderWidth: 1,
+                borderColor: theme === 'dark' ? Colors.gray600 : Colors.gray300,
+              }}>
+              <CustomText
+                size="xl"
+                style={{ textAlign: 'right' }}
+                color={theme === 'dark' ? Colors.white : Colors.black}>
+                {index + 1}. {verse.arabic_text}
+              </CustomText>
+              <CustomText
+                size="lg"
+                style={{ textAlign: 'left' }}
+                color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
+                {verse.translation}
+              </CustomText>
+              <CustomText
+                size="base"
+                style={{ textAlign: 'left', marginTop: 8 }}
+                color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
+                {verse.wolof}
+              </CustomText>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

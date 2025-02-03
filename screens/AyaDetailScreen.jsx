@@ -1,10 +1,15 @@
-import { YStack, Text, Button } from 'tamagui';
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, SafeAreaView } from "react-native";
 
 import { useTheme } from '../context/ThemeContext';
 import { getAyaTranslation } from '../services/quranService';
 import useStore from '../store/store';
+
+// Importation des composants personnalisés
+import { CustomButton } from "../components/ui/Button";
+import { CustomText } from "../components/ui/Typography";
+import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
+import { Colors } from "../components/ui/Colors";
 
 export default function AyaDetailScreen({ route }) {
   const { suraNumber, ayaNumber } = route.params;
@@ -40,41 +45,45 @@ export default function AyaDetailScreen({ route }) {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" />;
+    return <CustomLoadingIndicator />;
   }
 
   return (
-    <YStack flex={1} padding={16} backgroundColor={theme === 'dark' ? '#000' : '#fff'}>
-      <Text
+    <SafeAreaView style={{
+      flex: 1,
+      padding: 16,
+      backgroundColor: theme === 'dark' ? Colors.background : Colors.background
+    }}>
+      <CustomText
         fontSize={24}
         fontWeight="bold"
         marginBottom={16}
-        color={theme === 'dark' ? '#fff' : '#000'}>
+        color={theme === 'dark' ? Colors.text : Colors.text}>
         Sourate {suraNumber}, Verset {ayaNumber}
-      </Text>
+      </CustomText>
       {aya && (
-        <YStack>
-          <Text
+        <View>
+          <CustomText
             fontSize={24}
             textAlign="right"
             marginBottom={16}
-            color={theme === 'dark' ? '#fff' : '#000'}>
+            color={theme === 'dark' ? Colors.text : Colors.text}>
             {aya.arabic_text}
-          </Text>
-          <Text fontSize={18} marginBottom={16} color={theme === 'dark' ? '#fff' : '#000'}>
+          </CustomText>
+          <CustomText fontSize={18} marginBottom={16} color={theme === 'dark' ? Colors.text : Colors.text}>
             {aya.translation}
-          </Text>
-          <Button
-            backgroundColor={isFavorite ? 'red' : 'blue'}
+          </CustomText>
+          <CustomButton
+            backgroundColor={isFavorite ? Colors.error : Colors.primary}
             borderRadius={8}
             padding={16}
             onPress={handleFavoritePress}>
-            <Text color="#fff" textAlign="center">
+            <CustomText color={Colors.background} textAlign="center">
               {isFavorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
-            </Text>
-          </Button>
-        </YStack>
+            </CustomText>
+          </CustomButton>
+        </View>
       )}
-    </YStack>
+    </SafeAreaView>
   );
 }

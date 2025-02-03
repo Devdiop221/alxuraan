@@ -1,10 +1,16 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { Audio } from 'expo-av';
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, Alert, Text, View, TouchableOpacity } from 'react-native';
+import { Alert, SafeAreaView, View } from "react-native";
 import Slider from '@react-native-community/slider';
 
-export default function PlayerScreen({ route }) {
+// Importation des composants personnalisés
+import { CustomButton } from "../components/ui/Button";
+import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
+import { CustomText } from "../components/ui/Typography";
+import { Colors } from "../components/ui/Colors";
+
+export default function PlayerScreen({ route, navigation }) {
   const { audioUrl, surahName, surahNumber } = route.params;
   const [sound, setSound] = useState(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -39,7 +45,11 @@ export default function PlayerScreen({ route }) {
         setLoading(false);
       } catch (error) {
         console.error('Error loading audio:', error);
-        setError("Erreur lors du chargement de l'audio. Veuillez réessayer.");
+        if (error.code === -1100) {
+          setError("L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer.");
+        } else {
+          setError("Erreur lors du chargement de l'audio. Veuillez réessayer.");
+        }
         setLoading(false);
       }
     };
@@ -90,25 +100,43 @@ export default function PlayerScreen({ route }) {
   };
 
   if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
+    return <CustomLoadingIndicator />;
   }
 
   if (error) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <Text className="text-red-500">{error}</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: Colors.background,
+        }}>
+        <CustomText color="error" size="lg" weight="bold" style={{ marginBottom: 20 }}>
+          {error}
+        </CustomText>
+        <CustomButton onPress={() => navigation.goBack()} variant="primary">
+          Retour
+        </CustomButton>
       </View>
     );
   }
 
   return (
-    <View className="flex-1 justify-center items-center p-5">
-      <Text className="text-2xl font-bold mb-2">{surahName}</Text>
-      <Text className="text-lg mb-5">Sourate {surahNumber}</Text>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+        backgroundColor: Colors.background,
+      }}>
+      <CustomText size="2xl" weight="bold" style={{ marginBottom: 10 }}>
+        {surahName}
+      </CustomText>
+      <CustomText size="lg" style={{ marginBottom: 20 }}>
+        Sourate {surahNumber}
+      </CustomText>
 
       <Slider
         value={position}
@@ -121,15 +149,20 @@ export default function PlayerScreen({ route }) {
         style={{ width: '100%', marginBottom: 20 }}
       />
 
-      <View className="flex-row justify-between w-full">
-        <Text>{formatTime(position)}</Text>
-        <Text>{formatTime(duration)}</Text>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+        <CustomText>{formatTime(position)}</CustomText>
+        <CustomText>{formatTime(duration)}</CustomText>
       </View>
 
-      <TouchableOpacity onPress={playPauseAudio} className="mt-5 p-3 bg-blue-500 rounded-lg flex-row items-center">
+      <CustomButton
+        onPress={playPauseAudio}
+        variant="primary"
+        style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center' }}>
         <MaterialIcons name={isPlaying ? 'pause' : 'play-arrow'} size={24} color="white" />
-        <Text className="text-black ml-2">{isPlaying ? 'Pause' : 'Lecture'}</Text>
-      </TouchableOpacity>
-    </View>
+        <CustomText size="md" style={{ marginLeft: 10 }}>
+          {isPlaying ? 'Pause' : 'Lecture'}
+        </CustomText>
+      </CustomButton>
+    </SafeAreaView>
   );
 }

@@ -1,6 +1,13 @@
 import axios from 'axios';
 import React, { useState, useEffect } from 'react';
-import { FlatList, ActivityIndicator, View, Text, TouchableOpacity } from 'react-native';
+import { View, FlatList, SafeAreaView } from 'react-native';
+
+// Importation des composants personnalisés
+import { CustomButton } from "../components/ui/Button";
+import { CustomCard } from "../components/ui/Card";
+import { Colors } from "../components/ui/Colors";
+import { CustomLoadingIndicator } from "../components/ui/LoadingIndicator";
+import { CustomText } from "../components/ui/Typography";
 
 export default function QarisScreen({ navigation }) {
   const [qaris, setQaris] = useState([]);
@@ -17,7 +24,11 @@ export default function QarisScreen({ navigation }) {
         setLoading(false);
       } catch (error) {
         console.error('Error fetching qaris:', error);
-        setError('Erreur lors du chargement des récitateurs. Veuillez réessayer.');
+        if (error.response && error.response.status === 404) {
+          setError("L'URL audio n'a pas été trouvée sur le serveur. Veuillez vérifier l'URL et réessayer.");
+        } else {
+          setError('Erreur lors du chargement des récitateurs. Veuillez réessayer.');
+        }
         setLoading(false);
       }
     };
@@ -26,36 +37,65 @@ export default function QarisScreen({ navigation }) {
   }, []);
 
   if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center">
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
+    return <CustomLoadingIndicator />;
   }
 
   if (error) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <Text className="text-red-500">{error}</Text>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: Colors.background,
+        }}>
+        <CustomText color="error" size="lg" weight="bold" style={{ marginBottom: 20 }}>
+          {error}
+        </CustomText>
+        <CustomButton onPress={() => navigation.goBack()} variant="primary">
+          Retour
+        </CustomButton>
       </View>
     );
   }
 
   const renderQari = ({ item }) => (
-    <View className="m-2 p-4 rounded-lg bg-gray-200">
-      <Text className="text-lg font-bold">{item.name}</Text>
-      <Text className="text-gray-600">{item.language}</Text>
-      <TouchableOpacity
+    <CustomCard
+      style={{
+        marginVertical: 10,
+        marginHorizontal: 15,
+      }}>
+      <CustomText size="lg" weight="bold" style={{ marginBottom: 5 }}>
+        {item.name}
+      </CustomText>
+
+      <CustomText size="md" color="textSecondary" style={{ marginBottom: 10 }}>
+        {item.language}
+      </CustomText>
+
+      <CustomButton
         onPress={() => navigation.navigate('Surahs', { edition: item.identifier })}
-        className="mt-2 p-2 bg-blue-500 rounded-lg">
-        <Text className="text-white text-center">Voir les sourates</Text>
-      </TouchableOpacity>
-    </View>
+        variant="primary">
+        Voir les sourates
+      </CustomButton>
+    </CustomCard>
   );
 
   return (
-    <View className="flex-1 bg-white">
-      <FlatList data={qaris} renderItem={renderQari} keyExtractor={(item) => item.identifier} />
-    </View>
+    <SafeAreaView
+      style={{
+        flex: 1,
+        backgroundColor: Colors.background,
+      }}>
+      <FlatList
+        data={qaris}
+        renderItem={renderQari}
+        keyExtractor={(item) => item.identifier}
+        contentContainerStyle={{
+          paddingTop: 10,
+          paddingBottom: 20,
+        }}
+      />
+    </SafeAreaView>
   );
 }
