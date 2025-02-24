@@ -31,6 +31,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   assetBundlePatterns: ['**/*'],
   ios: {
     supportsTablet: true,
+    infoPlist: {
+      UIBackgroundModes: ['audio'],
+    }
   },
   android: {
     adaptiveIcon: {

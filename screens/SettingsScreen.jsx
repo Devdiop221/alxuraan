@@ -44,6 +44,16 @@ export default function SettingsScreen() {
           style={{ marginTop: 12, padding: 12, backgroundColor: Colors.success, borderRadius: 8 }}>
           <CustomText color={Colors.background}>Modifier le profil</CustomText>
         </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            marginTop: 12,
+            padding: 12,
+            backgroundColor: Colors.secondary,
+            borderRadius: 8,
+          }}>
+          <CustomText color={Colors.secondary}>A propos de nous</CustomText>
+        </TouchableOpacity>
         <TouchableOpacity
           style={{ marginTop: 12, padding: 12, backgroundColor: Colors.error, borderRadius: 8 }}>
           <CustomText color={Colors.background}>Déconnexion</CustomText>

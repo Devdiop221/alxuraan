@@ -9,6 +9,8 @@ import { Colors } from '../components/ui/Colors';
 import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
 import { CustomText } from '../components/ui/Typography';
 
+
+
 export default function SurahsScreen({ route, navigation }) {
   const { edition } = route.params;
   const [surahs, setSurahs] = useState([]);
