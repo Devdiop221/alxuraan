@@ -19,6 +19,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         launchMode: 'most-recent',
       },
     ],
+    [
+      "expo-sensors",
+      {
+        "motionPermission": "Allow $(PRODUCT_NAME) to access your device motion"
+      }
+    ]
   ],
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -33,7 +39,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     supportsTablet: true,
     infoPlist: {
       UIBackgroundModes: ['audio'],
-    }
+    },
   },
   android: {
     adaptiveIcon: {
