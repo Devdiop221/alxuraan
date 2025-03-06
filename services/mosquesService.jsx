@@ -1,5 +1,7 @@
 import axios from 'axios';
 
+const MOSQUES_API_BASE_URL = 'https://api.example.com/mosques'; // À remplacer par l'API réelle
+
 /**
  * Service pour localiser les mosquées utilisant Google Places API
  */
@@ -33,24 +35,79 @@ export const MosquesService = {
   },
 
   /**
-   * Obtenir les détails d'une mosquée
-   * @param {string} placeId - ID du lieu Google Places
-   * @param {string} apiKey - Clé API Google Places
-   * @returns {Promise} - Promesse contenant les détails de la mosquée
+   * Obtenir les streams en direct des mosquées sacrées
+   * @returns {Promise} - Promesse contenant les streams en direct
    */
-  getMosqueDetails: async (placeId, apiKey) => {
+  getLiveStreams: async () => {
     try {
-      const response = await axios.get(`https://maps.googleapis.com/maps/api/place/details/json`, {
-        params: {
-          place_id: placeId,
-          fields:
-            'name,formatted_address,formatted_phone_number,opening_hours,photos,rating,website',
-          key: apiKey,
+      // En attendant l'API réelle, on retourne des données statiques
+      return [
+        {
+          id: '1',
+          title: 'Masjid Al-Nabawi Live',
+          speaker: "Mosquée du Prophète, Médine",
+          viewers: 5200,
+          thumbnail: 'https://example.com/thumbnails/masjid-nabawi.jpg',
+          isLive: true,
+          youtubeUrl: 'https://www.youtube.com/live/j_JS9cYi234?si=fE9_n9W6mWTIKtjK',
         },
-      });
-      return response.data.result;
+        {
+          id: '2',
+          title: 'Masjid Al-Haram Live',
+          speaker: 'Grande Mosquée, La Mecque',
+          viewers: 7800,
+          thumbnail: 'https://example.com/thumbnails/masjid-haram.jpg',
+          isLive: true,
+          youtubeUrl: 'https://www.youtube.com/live/tko4c06NJeA?si=ULNX3o7MC8M9fWVY',
+        },
+      ];
+    } catch (error) {
+      console.error('Erreur lors de la récupération des streams:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtenir les informations d'une mosquée spécifique
+   * @param {string} mosqueId - ID de la mosquée
+   * @returns {Promise} - Promesse contenant les informations de la mosquée
+   */
+  getMosqueDetails: async (mosqueId) => {
+    try {
+      const response = await axios.get(`${MOSQUES_API_BASE_URL}/${mosqueId}`);
+      return response.data;
     } catch (error) {
       console.error('Erreur lors de la récupération des détails de la mosquée:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtenir les horaires d'une mosquée spécifique
+   * @param {string} mosqueId - ID de la mosquée
+   * @returns {Promise} - Promesse contenant les horaires de prière
+   */
+  getMosquePrayerTimes: async (mosqueId) => {
+    try {
+      const response = await axios.get(`${MOSQUES_API_BASE_URL}/${mosqueId}/prayer-times`);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des horaires de prière:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtenir les événements d'une mosquée
+   * @param {string} mosqueId - ID de la mosquée
+   * @returns {Promise} - Promesse contenant les événements
+   */
+  getMosqueEvents: async (mosqueId) => {
+    try {
+      const response = await axios.get(`${MOSQUES_API_BASE_URL}/${mosqueId}/events`);
+      return response.data;
+    } catch (error) {
+      console.error('Erreur lors de la récupération des événements:', error);
       throw error;
     }
   },

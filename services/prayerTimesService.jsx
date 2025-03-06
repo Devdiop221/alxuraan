@@ -1,6 +1,40 @@
 import axios from 'axios';
 import * as Location from 'expo-location';
 import * as Notifications from 'expo-notifications';
+import * as BackgroundFetch from 'expo-background-fetch';
+import * as TaskManager from 'expo-task-manager';
+
+const BACKGROUND_FETCH_TASK = 'BACKGROUND_FETCH_TASK';
+
+// Enregistrer la tâche de fond
+TaskManager.defineTask(BACKGROUND_FETCH_TASK, async () => {
+  try {
+    const location = await getUserLocation();
+    if (location) {
+      const { latitude, longitude } = location;
+      const times = await getPrayerTimesByCoords(latitude, longitude);
+      await schedulePrayerTimeNotifications(times);
+    }
+    return BackgroundFetch.BackgroundFetchResult.NewData;
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour des notifications:', error);
+    return BackgroundFetch.BackgroundFetchResult.Failed;
+  }
+});
+
+// Enregistrer la tâche de fond
+export const registerBackgroundFetch = async () => {
+  try {
+    await BackgroundFetch.registerTaskAsync(BACKGROUND_FETCH_TASK, {
+      minimumInterval: 60 * 60, // 1 heure
+      stopOnTerminate: false,
+      startOnBoot: true,
+    });
+    console.log('Tâche de fond enregistrée avec succès');
+  } catch (error) {
+    console.error('Erreur lors de l\'enregistrement de la tâche de fond:', error);
+  }
+};
 
 /**
  * Obtenir la localisation de l'utilisateur
@@ -71,11 +105,11 @@ export const schedulePrayerTimeNotifications = async (prayerTimes) => {
 
     // Liste des prières et leurs noms en français
     const prayers = [
-      { key: 'Fajr', name: 'Fajr (Aube)' },
-      { key: 'Dhuhr', name: 'Dhuhr (Midi)' },
-      { key: 'Asr', name: 'Asr (Après-midi)' },
-      { key: 'Maghrib', name: 'Maghrib (Coucher du soleil)' },
-      { key: 'Isha', name: 'Isha (Nuit)' }
+      { key: 'Fajr', name: 'Fajr (Aube)', icon: 'sunrise' },
+      { key: 'Dhuhr', name: 'Dhuhr (Midi)', icon: 'sun' },
+      { key: 'Asr', name: 'Asr (Après-midi)', icon: 'sun' },
+      { key: 'Maghrib', name: 'Maghrib (Coucher du soleil)', icon: 'sunset' },
+      { key: 'Isha', name: 'Isha (Nuit)', icon: 'moon' }
     ];
 
     // Programmer une notification pour chaque prière
@@ -90,11 +124,10 @@ export const schedulePrayerTimeNotifications = async (prayerTimes) => {
       const prayerDate = new Date(today);
       prayerDate.setHours(hours, minutes, 0);
 
-      // Si l'heure est déjà passée, ne pas programmer de notification
-      if (prayerDate <= new Date()) continue;
-
-      // Calculer le délai en secondes
-      const secondsUntilPrayer = Math.floor((prayerDate.getTime() - Date.now()) / 1000);
+      // Si l'heure est déjà passée, programmer pour le lendemain
+      if (prayerDate <= new Date()) {
+        prayerDate.setDate(prayerDate.getDate() + 1);
+      }
 
       // Programmer la notification
       await Notifications.scheduleNotificationAsync({
@@ -102,13 +135,32 @@ export const schedulePrayerTimeNotifications = async (prayerTimes) => {
           title: `C'est l'heure de la prière: ${prayer.name}`,
           body: `Il est ${time}`,
           sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
         },
         trigger: {
-          seconds: secondsUntilPrayer,
+          date: prayerDate,
+          channelId: 'prayer-times',
         },
       });
 
-      console.log(`Notification programmée pour ${prayer.key} à ${time}`);
+      // Programmer une notification de rappel 15 minutes avant
+      const reminderDate = new Date(prayerDate);
+      reminderDate.setMinutes(reminderDate.getMinutes() - 15);
+
+      await Notifications.scheduleNotificationAsync({
+        content: {
+          title: `Rappel: ${prayer.name} dans 15 minutes`,
+          body: `La prière de ${prayer.name} est à ${time}`,
+          sound: true,
+          priority: Notifications.AndroidNotificationPriority.HIGH,
+        },
+        trigger: {
+          date: reminderDate,
+          channelId: 'prayer-times',
+        },
+      });
+
+      console.log(`Notifications programmées pour ${prayer.key} à ${time}`);
     }
   } catch (error) {
     console.error('Erreur lors de la planification des notifications:', error);
@@ -118,7 +170,7 @@ export const schedulePrayerTimeNotifications = async (prayerTimes) => {
 /**
  * Configurer le gestionnaire de notifications
  */
-export const setupNotifications = () => {
+export const setupNotifications = async () => {
   // Configuration des notifications
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -127,4 +179,16 @@ export const setupNotifications = () => {
       shouldSetBadge: false,
     }),
   });
+
+  // Créer le canal de notification pour Android
+  await Notifications.setNotificationChannelAsync('prayer-times', {
+    name: 'Horaires de prière',
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#FF231F7C',
+    sound: true,
+  });
+
+  // Enregistrer la tâche de fond
+  await registerBackgroundFetch();
 };

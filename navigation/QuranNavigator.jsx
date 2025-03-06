@@ -1,29 +1,46 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../components/ui/Theme';
 import QuranScreen from '../screens/QuranScreen';
 import SourateDetail from '../screens/SourateDetail';
 
 const Stack = createStackNavigator();
 
 export default function QuranNavigator() {
-  const { theme } = useTheme();
-
   return (
     <Stack.Navigator
       screenOptions={{
-        cardStyle: { backgroundColor: theme === 'dark' ? '#000' : '#fff' },
+        cardStyle: { backgroundColor: COLORS.background },
         headerStyle: {
-          backgroundColor: theme === 'dark' ? '#1f2937' : '#f9fafb',
+          backgroundColor: COLORS.cardBackground,
+          elevation: 0,
+          shadowOpacity: 0,
+          height: 60,
         },
-        headerTintColor: theme === 'dark' ? '#fff' : '#000',
+        headerTitleStyle: {
+          color: COLORS.textPrimary,
+          fontSize: 18,
+          fontWeight: '600',
+        },
+        headerTintColor: COLORS.primary,
+        headerBackTitleVisible: false,
+        headerLeftContainerStyle: {
+          paddingLeft: SPACING.md,
+        },
+        headerRightContainerStyle: {
+          paddingRight: SPACING.md,
+        },
+        cardStyleInterpolator: ({ current: { progress } }) => ({
+          cardStyle: {
+            opacity: progress,
+          },
+        }),
         headerShown: false,
       }}
     >
       <Stack.Screen
         name="Quran"
         component={QuranScreen}
-        options={{ headerShown: false }}
       />
       <Stack.Screen
         name="SourateDetail"

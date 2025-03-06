@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View, SafeAreaView } from 'react-native';
+import { ScrollView, View, SafeAreaView, TouchableOpacity } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Bookmark, Share2, BookmarkCheck } from 'lucide-react-native';
+import { Share } from 'react-native';
 
-import { Colors } from '../components/ui/Colors';
 import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
 import { CustomText } from '../components/ui/Typography';
-import { useTheme } from '../context/ThemeContext';
+import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
 import wolofData from '../data/quran_wolof.json';
 import { getSuraTranslation } from '../services/quranService';
+import useStore from '../store/store';
 
 export default function SourateDetail({ route }) {
   const { suraNumber, suraNameAr, suraNameFr } = route.params;
-  const { theme } = useTheme();
   const [verses, setVerses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { favorites, addFavorite, removeFavorite } = useStore();
   const [suraName, setSuraName] = useState({
     name_ar: suraNameAr,
     name_fr: suraNameFr,
@@ -40,71 +43,171 @@ export default function SourateDetail({ route }) {
     loadSura();
   }, [suraNumber]);
 
+  const handleShare = async (verse, index) => {
+    try {
+      const message = `${verse.arabic_text}\n\n${verse.translation}${verse.wolof ? '\n\n' + verse.wolof : ''}\n\nSourate ${suraNumber}, Verset ${index + 1}`;
+      await Share.share({ message });
+    } catch (error) {
+      console.error('Erreur lors du partage:', error);
+    }
+  };
+
+  const isVerseInFavorites = (verseNumber) => {
+    return favorites.some(fav =>
+      fav.suraNumber === suraNumber &&
+      fav.ayaNumber === verseNumber
+    );
+  };
+
+  const toggleFavorite = (verse, index) => {
+    const verseData = {
+      suraNumber,
+      ayaNumber: index + 1,
+      arabicText: verse.arabic_text,
+      translation: verse.translation,
+      wolofText: verse.wolof,
+    };
+
+    if (isVerseInFavorites(index + 1)) {
+      removeFavorite(suraNumber, index + 1);
+    } else {
+      addFavorite(verseData);
+    }
+  };
+
   if (loading) {
     return <CustomLoadingIndicator />;
   }
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: Colors.background,
-      }}>
-      <ScrollView
-        style={{
-          flex: 1,
-          backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
+    <LinearGradient colors={GRADIENTS.primary} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{
+          borderBottomWidth: 1,
+          borderBottomColor: COLORS.divider,
+          padding: SPACING.md
         }}>
-        <View style={{ borderBottomWidth: 1, borderBottomColor: Colors.gray300, padding: 16 }}>
           <CustomText
             size="2xl"
             weight="bold"
             style={{ textAlign: 'center' }}
-            color={theme === 'dark' ? Colors.text : Colors.text}>
+            color={COLORS.textPrimary}>
             {suraName.name_ar} - {suraName.name_fr}
           </CustomText>
           <CustomText
             size="lg"
             style={{ textAlign: 'center' }}
-            color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
+            color={COLORS.textSecondary}>
             {suraName.name_wo}
           </CustomText>
         </View>
 
-        <View style={{ padding: 16 }}>
+        <ScrollView
+          style={{ flex: 1 }}
+          contentContainerStyle={{ padding: SPACING.md }}>
           {verses.map((verse, index) => (
-            <View
+            <LinearGradient
               key={index}
+              colors={GRADIENTS.card}
               style={{
-                marginBottom: 16,
-                padding: 16,
-                borderRadius: 8,
-                backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200,
-                borderWidth: 1,
-                borderColor: theme === 'dark' ? Colors.gray600 : Colors.gray300,
+                marginBottom: SPACING.md,
+                padding: SPACING.md,
+                borderRadius: BORDER_RADIUS.md,
+                ...SHADOWS.base,
               }}>
+              <View style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginBottom: SPACING.base,
+              }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{
+                    backgroundColor: COLORS.buttonBg,
+                    paddingHorizontal: SPACING.base,
+                    paddingVertical: SPACING.xs,
+                    borderRadius: BORDER_RADIUS.lg,
+                    marginRight: SPACING.sm,
+                  }}>
+                    <CustomText color={COLORS.textPrimary} size="sm">
+                      {index + 1}:{suraNumber}
+                    </CustomText>
+                  </View>
+                  {verse.wolof && (
+                    <View style={{
+                      backgroundColor: COLORS.wolofBadge,
+                      paddingHorizontal: SPACING.sm,
+                      paddingVertical: SPACING.xs,
+                      borderRadius: BORDER_RADIUS.base,
+                    }}>
+                      <CustomText size="xs" color={COLORS.primary} weight="bold">
+                        WL
+                      </CustomText>
+                    </View>
+                  )}
+                </View>
+
+                <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
+                  <TouchableOpacity
+                    onPress={() => handleShare(verse, index)}
+                    style={{
+                      padding: SPACING.xs,
+                      backgroundColor: COLORS.buttonBg,
+                      borderRadius: BORDER_RADIUS.full,
+                    }}>
+                    <Share2 size={20} color={COLORS.textPrimary} />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => toggleFavorite(verse, index)}
+                    style={{
+                      padding: SPACING.xs,
+                      backgroundColor: COLORS.buttonBg,
+                      borderRadius: BORDER_RADIUS.full,
+                    }}>
+                    {isVerseInFavorites(index + 1) ? (
+                      <BookmarkCheck size={20} color={COLORS.primary} />
+                    ) : (
+                      <Bookmark size={20} color={COLORS.textPrimary} />
+                    )}
+                  </TouchableOpacity>
+                </View>
+              </View>
+
               <CustomText
                 size="xl"
-                style={{ textAlign: 'right' }}
-                color={theme === 'dark' ? Colors.white : Colors.black}>
-                {index + 1}. {verse.arabic_text}
+                style={{
+                  textAlign: 'right',
+                  marginBottom: SPACING.base,
+                  lineHeight: SPACING.xl * 1.5,
+                }}
+                color={COLORS.textPrimary}>
+                {verse.arabic_text}
               </CustomText>
               <CustomText
                 size="lg"
-                style={{ textAlign: 'left' }}
-                color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
+                style={{
+                  textAlign: 'left',
+                  marginBottom: verse.wolof ? SPACING.sm : 0,
+                  lineHeight: SPACING.lg * 1.5,
+                }}
+                color={COLORS.textSecondary}>
                 {verse.translation}
               </CustomText>
-              <CustomText
-                size="base"
-                style={{ textAlign: 'left', marginTop: 8 }}
-                color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
-                {verse.wolof}
-              </CustomText>
-            </View>
+              {verse.wolof && (
+                <CustomText
+                  size="base"
+                  style={{
+                    textAlign: 'left',
+                    lineHeight: SPACING.base * 1.5,
+                  }}
+                  color={COLORS.textSecondary}>
+                  {verse.wolof}
+                </CustomText>
+              )}
+            </LinearGradient>
           ))}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }

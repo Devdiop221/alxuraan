@@ -1,36 +1,62 @@
 import { useState, useEffect } from 'react';
-import { HadithService } from '../services/hadithService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import HadithService from '../services/HadithService';
 
 /**
  * Hook pour obtenir un hadith spécifique
- * @param {string} collection - Nom de la collection (bukhari, muslim, etc.)
+ * @param {string} collectionKey - Nom de la collection (bukhari, muslim, etc.)
  * @param {number} hadithNumber - Numéro du hadith
- * @param {string} apiKey - Clé API Sunnah.com
  * @returns {Object} - Données du hadith et état de chargement
  */
-export const useHadith = (collection, hadithNumber, apiKey) => {
+export const useHadith = (collectionKey, hadithNumber) => {
   const [hadith, setHadith] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [language, setLanguage] = useState('fr');
 
   useEffect(() => {
-    if (collection && hadithNumber && apiKey) {
+    loadLanguageSettings();
+    if (collectionKey && hadithNumber) {
       fetchHadith();
     }
-  }, [collection, hadithNumber, apiKey]);
+  }, [collectionKey, hadithNumber, language]);
 
-  // Fonction pour récupérer le hadith
+  const loadLanguageSettings = async () => {
+    try {
+      const savedLanguage = await AsyncStorage.getItem('@hadith_language');
+      if (savedLanguage) {
+        setLanguage(savedLanguage);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des paramètres de langue:', error);
+    }
+  };
+
   const fetchHadith = async () => {
     try {
       setLoading(true);
-      const data = await HadithService.getHadith(collection, hadithNumber, apiKey);
-      setHadith(data.data);
-      setLoading(false);
+      setError(null);
+      const data = await HadithService.getHadithByNumber(collectionKey, hadithNumber);
+      setHadith(data);
     } catch (error) {
-      setError('Erreur lors de la récupération du hadith');
+      console.error('Erreur lors de la récupération du hadith:', error);
+      setError("Une erreur s'est produite lors de la récupération du hadith");
+    } finally {
       setLoading(false);
     }
   };
 
-  return { hadith, loading, error };
+  const refresh = () => {
+    if (collectionKey && hadithNumber) {
+      fetchHadith();
+    }
+  };
+
+  return {
+    hadith,
+    loading,
+    error,
+    refresh,
+    language
+  };
 };

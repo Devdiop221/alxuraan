@@ -6,6 +6,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, useState } from 'react';
 
 import { ThemeProvider } from './context/ThemeContext';
+import { PlayerProvider } from './context/PlayerContext';
 import AppNavigator from './navigation/AppNavigator';
 import './global.css';
 
@@ -72,14 +73,16 @@ export default function App() {
   }, [appIsReady]);
 
   if (!appIsReady) {
-    return null; // Ou un écran de chargement personnalisé
+    return null;
   }
 
   return (
     <ThemeProvider>
-      <NavigationContainer>
-        <AppNavigator />
-      </NavigationContainer>
+      <PlayerProvider>
+        <NavigationContainer>
+          <AppNavigator />
+        </NavigationContainer>
+      </PlayerProvider>
     </ThemeProvider>
   );
 }

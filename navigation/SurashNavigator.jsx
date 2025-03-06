@@ -1,6 +1,6 @@
 import { createStackNavigator } from '@react-navigation/stack';
 import React from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../components/ui/Theme';
 import PlayerScreen from '../screens/PlayerScreen';
 import QarisScreen from '../screens/QarisScreen';
 import SurahsScreen from '../screens/SurahsScreen';
@@ -8,34 +8,62 @@ import SurahsScreen from '../screens/SurahsScreen';
 const Stack = createStackNavigator();
 
 export default function SurashNavigator() {
-  const { theme } = useTheme();
-
   return (
     <Stack.Navigator
-      h
       screenOptions={{
-        cardStyle: { backgroundColor: theme === 'dark' ? '#000' : '#fff' },
+        cardStyle: { backgroundColor: COLORS.background },
         headerStyle: {
-          backgroundColor: theme === 'dark' ? '#1f2937' : '#f9fafb',
+          backgroundColor: COLORS.cardBackground,
+          elevation: 0,
+          shadowOpacity: 0,
+          height: 60,
         },
-        headerTintColor: theme === 'dark' ? '#fff' : '#000',
+        headerTitleStyle: {
+          color: COLORS.textPrimary,
+          fontSize: 18,
+          fontWeight: '600',
+        },
+        headerTintColor: COLORS.primary,
+        headerBackTitleVisible: false,
+        headerLeftContainerStyle: {
+          paddingLeft: SPACING.md,
+        },
+        headerRightContainerStyle: {
+          paddingRight: SPACING.md,
+        },
+        cardStyleInterpolator: ({ current: { progress }, next }) => ({
+          cardStyle: {
+            transform: [
+              {
+                translateX: progress.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [300, 0],
+                }),
+              },
+            ],
+            opacity: progress,
+          },
+          overlayStyle: {
+            opacity: progress.interpolate({
+              inputRange: [0, 1],
+              outputRange: [0, 0.5],
+            }),
+          },
+        }),
         headerShown: false,
       }}
     >
       <Stack.Screen
         name="Qaris"
         component={QarisScreen}
-        options={{ title: 'Récitateurs' }}
       />
       <Stack.Screen
         name="Surahs"
         component={SurahsScreen}
-        options={{ title: 'Sourates' }}
       />
       <Stack.Screen
         name="Player"
         component={PlayerScreen}
-        options={{ title: 'Lecteur' }}
       />
     </Stack.Navigator>
   );

@@ -1,64 +1,131 @@
 import React from 'react';
-import { View, TouchableOpacity } from 'react-native';
+import { View, TouchableOpacity, SafeAreaView, Switch } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Moon, Sun, User, Info, LogOut, ChevronRight, Bell } from 'lucide-react-native';
 
-import { Colors } from '../components/ui/Colors';
 import { CustomText } from '../components/ui/Typography';
+import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS } from '../components/ui/Theme';
 import { useTheme } from '../context/ThemeContext';
 
-// Importation des composants personnalisés
+const SettingItem = ({ icon: Icon, title, subtitle, onPress, rightElement }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: SPACING.md,
+      backgroundColor: COLORS.cardBackground,
+      borderRadius: BORDER_RADIUS.md,
+      marginBottom: SPACING.sm,
+    }}>
+    <View style={{
+      width: 40,
+      height: 40,
+      borderRadius: BORDER_RADIUS.full,
+      backgroundColor: COLORS.buttonBg,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: SPACING.md,
+    }}>
+      <Icon size={24} color={COLORS.textPrimary} />
+    </View>
+    <View style={{ flex: 1 }}>
+      <CustomText weight="bold" color={COLORS.textPrimary}>
+        {title}
+      </CustomText>
+      {subtitle && (
+        <CustomText size="sm" color={COLORS.textSecondary}>
+          {subtitle}
+        </CustomText>
+      )}
+    </View>
+    {rightElement || (
+      <ChevronRight size={20} color={COLORS.textSecondary} />
+    )}
+  </TouchableOpacity>
+);
 
 export default function SettingsScreen() {
   const { theme, toggleTheme } = useTheme();
+  const [notificationsEnabled, setNotificationsEnabled] = React.useState(true);
+
+  const handleLogout = () => {
+    // TODO: Implémenter la déconnexion
+  };
 
   return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
-      }}>
-      <CustomText
-        size="2xl"
-        weight="bold"
-        style={{ marginBottom: 16 }}
-        color={theme === 'dark' ? Colors.text : Colors.text}>
-        Thème actuel : {theme}
-      </CustomText>
-      <TouchableOpacity
-        onPress={toggleTheme}
-        style={{ marginTop: 20, padding: 12, backgroundColor: Colors.primary, borderRadius: 8 }}>
-        <CustomText color={Colors.background}>Basculer le thème</CustomText>
-      </TouchableOpacity>
+    <LinearGradient colors={GRADIENTS.primary} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ padding: SPACING.md }}>
+          <CustomText
+            size="2xl"
+            weight="bold"
+            style={{ marginBottom: SPACING.xl }}
+            color={COLORS.textPrimary}>
+            Paramètres
+          </CustomText>
 
-      {/* Additional user account settings */}
-      <View style={{ marginTop: 40, width: '100%', paddingHorizontal: 16 }}>
-        <CustomText
-          size="xl"
-          weight="bold"
-          style={{ marginBottom: 16 }}
-          color={theme === 'dark' ? Colors.text : Colors.text}>
-          Paramètres du compte
-        </CustomText>
-        <TouchableOpacity
-          style={{ marginTop: 12, padding: 12, backgroundColor: Colors.success, borderRadius: 8 }}>
-          <CustomText color={Colors.background}>Modifier le profil</CustomText>
-        </TouchableOpacity>
+          <View style={{ marginBottom: SPACING.xl }}>
+            <CustomText
+              size="lg"
+              weight="bold"
+              style={{ marginBottom: SPACING.md }}
+              color={COLORS.textPrimary}>
+              Préférences
+            </CustomText>
 
-        <TouchableOpacity
-          style={{
-            marginTop: 12,
-            padding: 12,
-            backgroundColor: Colors.secondary,
-            borderRadius: 8,
-          }}>
-          <CustomText color={Colors.secondary}>A propos de nous</CustomText>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={{ marginTop: 12, padding: 12, backgroundColor: Colors.error, borderRadius: 8 }}>
-          <CustomText color={Colors.background}>Déconnexion</CustomText>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <SettingItem
+              icon={theme === 'dark' ? Moon : Sun}
+              title="Thème"
+              subtitle={theme === 'dark' ? 'Mode sombre' : 'Mode clair'}
+              onPress={toggleTheme}
+            />
+
+            <SettingItem
+              icon={Bell}
+              title="Notifications"
+              subtitle="Activer les rappels quotidiens"
+              rightElement={
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={setNotificationsEnabled}
+                  trackColor={{ false: COLORS.divider, true: COLORS.primary }}
+                  thumbColor={COLORS.textPrimary}
+                />
+              }
+            />
+          </View>
+
+          <View style={{ marginBottom: SPACING.xl }}>
+            <CustomText
+              size="lg"
+              weight="bold"
+              style={{ marginBottom: SPACING.md }}
+              color={COLORS.textPrimary}>
+              Compte
+            </CustomText>
+
+            <SettingItem
+              icon={User}
+              title="Profil"
+              subtitle="Modifier vos informations"
+            />
+
+            <SettingItem
+              icon={Info}
+              title="À propos"
+              subtitle="Informations sur l'application"
+            />
+
+            <SettingItem
+              icon={LogOut}
+              title="Déconnexion"
+              onPress={handleLogout}
+              rightElement={null}
+            />
+          </View>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }

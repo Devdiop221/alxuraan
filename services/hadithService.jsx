@@ -1,81 +1,248 @@
-import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-/**
- * Service pour accéder aux hadiths utilisant l'API Sunnah.com
- */
-export const HadithService = {
-  /**
-   * Initialiser les headers avec la clé API
-   * @param {string} apiKey - Clé API Sunnah.com
-   * @returns {Object} - Headers pour les requêtes
-   */
-  getHeaders: (apiKey) => {
-    return {
-      'X-API-Key': apiKey,
-      'Content-Type': 'application/json',
-    };
-  },
+// API Constants
+const RAPID_API_KEY = '0531dd984amsha2e296452693364p1bb81djsnbd9dc9624ece'; // Replace with your actual RapidAPI key
+const RAPID_API_HOST = 'hadith2.p.rapidapi.com';
+const BASE_URL = 'https://hadith2.p.rapidapi.com';
 
-  /**
-   * Obtenir une collection de hadiths
-   * @param {string} collection - Nom de la collection (bukhari, muslim, etc.)
-   * @param {string} apiKey - Clé API Sunnah.com
-   * @returns {Promise} - Promesse contenant la liste des collections
-   */
-  getCollection: async (collection, apiKey) => {
-    try {
-      const response = await axios.get(`https://api.sunnah.com/v1/collections/${collection}`, {
-        headers: HadithService.getHeaders(apiKey),
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la récupération de la collection:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Obtenir un hadith spécifique
-   * @param {string} collection - Nom de la collection (bukhari, muslim, etc.)
-   * @param {number} hadithNumber - Numéro du hadith
-   * @param {string} apiKey - Clé API Sunnah.com
-   * @returns {Promise} - Promesse contenant le hadith
-   */
-  getHadith: async (collection, hadithNumber, apiKey) => {
-    try {
-      const response = await axios.get(
-        `https://api.sunnah.com/v1/collections/${collection}/hadiths/${hadithNumber}`,
-        { headers: HadithService.getHeaders(apiKey) }
-      );
-      return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la récupération du hadith:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Rechercher des hadiths par mot-clé
-   * @param {string} query - Terme de recherche
-   * @param {string} apiKey - Clé API Sunnah.com
-   * @param {number} page - Numéro de page
-   * @param {number} limit - Nombre de résultats par page
-   * @returns {Promise} - Promesse contenant les résultats de recherche
-   */
-  searchHadiths: async (query, apiKey, page = 1, limit = 10) => {
-    try {
-      const response = await axios.get(`https://api.sunnah.com/v1/hadiths/search`, {
-        headers: HadithService.getHeaders(apiKey),
-        params: {
-          q: query,
-          page,
-          limit,
-        },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Erreur lors de la recherche de hadiths:', error);
-      throw error;
-    }
-  },
+// Default headers for all API requests
+const getHeaders = () => {
+  return {
+    'X-RapidAPI-Key': RAPID_API_KEY,
+    'X-RapidAPI-Host': RAPID_API_HOST,
+    'Content-Type': 'application/json'
+  };
 };
+
+// Utility function to make API requests
+const apiRequest = async (endpoint, options = {}) => {
+  try {
+    // Check for cached data
+    const cacheKey = `@hadith_cache_${endpoint}`;
+    const cachedData = await AsyncStorage.getItem(cacheKey);
+
+    // If we have valid cached data, return it
+    if (cachedData) {
+      const parsedData = JSON.parse(cachedData);
+      // Check if cache is still valid (less than 24 hours old)
+      if (parsedData.timestamp && (Date.now() - parsedData.timestamp < 24 * 60 * 60 * 1000)) {
+        return parsedData.data;
+      }
+    }
+
+    // Make the API request
+    const response = await fetch(`${BASE_URL}${endpoint}`, {
+      headers: getHeaders(),
+      ...options
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // Cache the successful response
+    const cacheData = {
+      timestamp: Date.now(),
+      data: data
+    };
+    await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
+
+    return data;
+  } catch (error) {
+    console.error(`Error in API request to ${endpoint}:`, error);
+    throw error;
+  }
+};
+
+// Hadith Service with RapidAPI integration
+const HadithService = {
+  // Get all available collections
+  getCollections: async () => {
+    try {
+      const response = await apiRequest('/collections');
+
+      // Transform the response to match our application format
+      return response.data.map(collection => ({
+        key: collection.id || collection.name.toLowerCase().replace(/\s/g, ''),
+        name: collection.name,
+        description: collection.description || `Collection of hadiths from ${collection.name}`,
+        totalHadith: collection.total || 0,
+        languages: collection.languages || ['ar', 'en'],
+        available: true
+      }));
+    } catch (error) {
+      console.error('Error fetching collections:', error);
+      throw error;
+    }
+  },
+
+  // Get a specific collection
+  getCollection: async (collectionKey) => {
+    try {
+      const response = await apiRequest(`/collection/${collectionKey}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching collection ${collectionKey}:`, error);
+      throw error;
+    }
+  },
+
+  // Get hadith by number within a collection
+  getHadithByNumber: async (collectionKey, hadithNumber, options = {}) => {
+    try {
+      const language = options.language || 'en';
+      const response = await apiRequest(`/hadith/${collectionKey}/${hadithNumber}?language=${language}`);
+
+      // Transform to our app format
+      return {
+        collection: collectionKey,
+        hadithNumber: hadithNumber,
+        hadithArabic: response.data.text.ar || response.data.text.arabic || '',
+        translations: {
+          ar: response.data.text.ar || response.data.text.arabic || '',
+          en: response.data.text.en || response.data.text.english || '',
+          fr: response.data.text.fr || response.data.text.french || ''
+        },
+        narrator: response.data.narrator || 'Unknown',
+        grade: response.data.grade || 'Unknown',
+        collectionInfo: {
+          name: response.data.collection || collectionKey,
+          key: collectionKey
+        }
+      };
+    } catch (error) {
+      console.error(`Error fetching hadith ${collectionKey}/${hadithNumber}:`, error);
+      throw error;
+    }
+  },
+
+  // Get a random hadith
+  getRandomHadith: async (options = {}) => {
+    try {
+      const language = options.language || 'en';
+      const response = await apiRequest(`/hadith/random?language=${language}`);
+
+      // Transform to our app format
+      return {
+        collection: response.data.collection.id || 'unknown',
+        hadithNumber: response.data.number || 1,
+        hadithArabic: response.data.text.ar || response.data.text.arabic || '',
+        translations: {
+          ar: response.data.text.ar || response.data.text.arabic || '',
+          en: response.data.text.en || response.data.text.english || '',
+          fr: response.data.text.fr || response.data.text.french || ''
+        },
+        narrator: response.data.narrator || 'Unknown',
+        grade: response.data.grade || 'Unknown',
+        collectionInfo: {
+          name: response.data.collection.name || 'Unknown Collection',
+          key: response.data.collection.id || 'unknown'
+        }
+      };
+    } catch (error) {
+      console.error('Error fetching random hadith:', error);
+      throw error;
+    }
+  },
+
+  // Search hadiths
+  searchHadiths: async (query, options = {}) => {
+    try {
+      const language = options.language || 'en';
+      const collection = options.collection || '';
+      const page = options.page || 1;
+      const limit = options.limit || 10;
+
+      let endpoint = `/search?q=${encodeURIComponent(query)}&language=${language}&page=${page}&limit=${limit}`;
+      if (collection) {
+        endpoint += `&collection=${collection}`;
+      }
+
+      const response = await apiRequest(endpoint);
+
+      // Transform to our app format
+      return {
+        results: response.data.hadiths.map(hadith => ({
+          collection: hadith.collection.id || 'unknown',
+          hadithNumber: hadith.number || 1,
+          hadithArabic: hadith.text.ar || hadith.text.arabic || '',
+          translations: {
+            ar: hadith.text.ar || hadith.text.arabic || '',
+            en: hadith.text.en || hadith.text.english || '',
+            fr: hadith.text.fr || hadith.text.french || ''
+          },
+          narrator: hadith.narrator || 'Unknown',
+          grade: hadith.grade || 'Unknown',
+          collectionInfo: {
+            name: hadith.collection.name || 'Unknown Collection',
+            key: hadith.collection.id || 'unknown'
+          }
+        })),
+        pagination: response.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalResults: response.data.hadiths.length
+        }
+      };
+    } catch (error) {
+      console.error(`Error searching hadiths for "${query}":`, error);
+      throw error;
+    }
+  },
+
+  // Get chapters/books for a collection
+  getCollectionChapters: async (collectionKey) => {
+    try {
+      const response = await apiRequest(`/collection/${collectionKey}/books`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching chapters for ${collectionKey}:`, error);
+      throw error;
+    }
+  },
+
+  // Get hadiths by chapter/book
+  getHadithsByChapter: async (collectionKey, chapterId, options = {}) => {
+    try {
+      const language = options.language || 'en';
+      const page = options.page || 1;
+      const limit = options.limit || 20;
+
+      const response = await apiRequest(
+        `/collection/${collectionKey}/book/${chapterId}?language=${language}&page=${page}&limit=${limit}`
+      );
+
+      return {
+        hadiths: response.data.hadiths.map(hadith => ({
+          collection: collectionKey,
+          hadithNumber: hadith.number || 1,
+          hadithArabic: hadith.text.ar || hadith.text.arabic || '',
+          translations: {
+            ar: hadith.text.ar || hadith.text.arabic || '',
+            en: hadith.text.en || hadith.text.english || '',
+            fr: hadith.text.fr || hadith.text.french || ''
+          },
+          narrator: hadith.narrator || 'Unknown',
+          grade: hadith.grade || 'Unknown',
+          collectionInfo: {
+            name: response.data.collection.name || collectionKey,
+            key: collectionKey
+          }
+        })),
+        pagination: response.data.pagination || {
+          currentPage: page,
+          totalPages: 1,
+          totalResults: response.data.hadiths.length
+        },
+        chapter: response.data.book || { name: 'Unknown Chapter' }
+      };
+    } catch (error) {
+      console.error(`Error fetching hadiths for chapter ${chapterId} in ${collectionKey}:`, error);
+      throw error;
+    }
+  }
+};
+
+export default HadithService;

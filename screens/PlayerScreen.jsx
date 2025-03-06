@@ -1,13 +1,16 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
-import React, { useState, useEffect } from 'react';
-import { Alert, SafeAreaView, View } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { Alert, SafeAreaView, View, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 import { CustomButton } from '../components/ui/Button';
 import { Colors } from '../components/ui/Colors';
 import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
 import { CustomText } from '../components/ui/Typography';
+
+const { width } = Dimensions.get('window');
 
 export default function PlayerScreen({ route, navigation }) {
   const { audioUrl, surahName, surahNumber } = route.params;
@@ -17,6 +20,8 @@ export default function PlayerScreen({ route, navigation }) {
   const [position, setPosition] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
     const loadAudio = async () => {
@@ -42,6 +47,21 @@ export default function PlayerScreen({ route, navigation }) {
         setSound(audioSound);
         setDuration(status.durationMillis || 0);
         setLoading(false);
+
+        // Démarrer l'animation après le chargement
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.spring(scaleAnim, {
+            toValue: 1,
+            friction: 8,
+            tension: 40,
+            useNativeDriver: true,
+          }),
+        ]).start();
       } catch (error) {
         console.error('Error loading audio:', error);
         if (error.code === -1100) {
@@ -106,13 +126,7 @@ export default function PlayerScreen({ route, navigation }) {
 
   if (error) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: Colors.background,
-        }}>
+      <View style={styles.errorContainer}>
         <CustomText color="error" size="lg" weight="bold" style={{ marginBottom: 20 }}>
           {error}
         </CustomText>
@@ -124,46 +138,139 @@ export default function PlayerScreen({ route, navigation }) {
   }
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
-        backgroundColor: Colors.background,
-      }}>
-      <CustomText size="2xl" weight="bold" style={{ marginBottom: 10 }}>
-        {surahName}
-      </CustomText>
-      <CustomText size="lg" style={{ marginBottom: 20 }}>
-        Sourate {surahNumber}
-      </CustomText>
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#4FACFE', '#00F2FE']}
+        style={styles.gradient}>
+        <Animated.View
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }]
+            }
+          ]}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => navigation.goBack()}>
+              <MaterialIcons name="arrow-back" size={24} color="white" />
+            </TouchableOpacity>
+            <CustomText size="2xl" weight="bold" style={styles.title}>
+              {surahName}
+            </CustomText>
+            <CustomText size="lg" style={styles.subtitle}>
+              Sourate {surahNumber}
+            </CustomText>
+          </View>
 
-      <Slider
-        value={position}
-        maximumValue={duration}
-        onValueChange={(value) => {
-          if (sound) {
-            sound.setPositionAsync(value);
-          }
-        }}
-        style={{ width: '100%', marginBottom: 20 }}
-      />
+          <View style={styles.playerContainer}>
+            <View style={styles.progressContainer}>
+              <Slider
+                value={position}
+                maximumValue={duration}
+                onValueChange={(value) => {
+                  if (sound) {
+                    sound.setPositionAsync(value);
+                  }
+                }}
+                style={styles.slider}
+                minimumTrackTintColor="#FFFFFF"
+                maximumTrackTintColor="rgba(255,255,255,0.3)"
+                thumbTintColor="#FFFFFF"
+              />
+              <View style={styles.timeContainer}>
+                <CustomText style={styles.timeText}>{formatTime(position)}</CustomText>
+                <CustomText style={styles.timeText}>{formatTime(duration)}</CustomText>
+              </View>
+            </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-        <CustomText>{formatTime(position)}</CustomText>
-        <CustomText>{formatTime(duration)}</CustomText>
-      </View>
-
-      <CustomButton
-        onPress={playPauseAudio}
-        variant="primary"
-        style={{ marginTop: 20, flexDirection: 'row', alignItems: 'center' }}>
-        <MaterialIcons name={isPlaying ? 'pause' : 'play-arrow'} size={24} color="white" />
-        <CustomText size="md" style={{ marginLeft: 10 }}>
-          {isPlaying ? 'Pause' : 'Lecture'}
-        </CustomText>
-      </CustomButton>
+            <TouchableOpacity
+              style={styles.playButton}
+              onPress={playPauseAudio}>
+              <MaterialIcons
+                name={isPlaying ? 'pause' : 'play-arrow'}
+                size={32}
+                color="#4FACFE"
+              />
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+      </LinearGradient>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  gradient: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    padding: 20,
+  },
+  header: {
+    alignItems: 'center',
+    marginBottom: 40,
+  },
+  backButton: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    padding: 8,
+  },
+  title: {
+    color: 'white',
+    marginTop: 40,
+    marginBottom: 8,
+  },
+  subtitle: {
+    color: 'rgba(255,255,255,0.8)',
+  },
+  playerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  progressContainer: {
+    width: '100%',
+    marginBottom: 40,
+  },
+  slider: {
+    width: '100%',
+    height: 40,
+    marginBottom: 10,
+  },
+  timeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+  },
+  timeText: {
+    color: 'white',
+    fontSize: 14,
+  },
+  playButton: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: Colors.background,
+    padding: 16,
+  },
+});

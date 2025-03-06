@@ -1,72 +1,49 @@
-import { Search, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { FlatList, View, TextInput, TouchableOpacity, SafeAreaView } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Search, ArrowLeft } from 'lucide-react-native';
 
-import { Colors } from '../components/ui/Colors';
 import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
 import { CustomText } from '../components/ui/Typography';
-import { useTheme } from '../context/ThemeContext';
+import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
 import { getSuraNames } from '../services/quranService';
 
-
-const PAGE_SIZE = 10;
-
 export default function QuranScreen({ navigation }) {
-  const { theme } = useTheme();
   const [sourates, setSourates] = useState([]);
   const [filteredSourates, setFilteredSourates] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [suraNames, setSuraNames] = useState([]);
 
   useEffect(() => {
     const loadSuraNames = async () => {
-      const names = await getSuraNames();
-      setSuraNames(names);
+      try {
+        const names = await getSuraNames();
+        setSourates(names);
+        setFilteredSourates(names);
+      } catch (error) {
+        console.error('Error loading sura names:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     loadSuraNames();
   }, []);
 
-  const loadSourates = async () => {
-    if (loading || sourates.length >= 114) return;
-    setLoading(true);
-
-    const startIndex = (page - 1) * PAGE_SIZE + 1;
-    const endIndex = Math.min(startIndex + PAGE_SIZE - 1, 114);
-
-    const newSourates = [];
-    for (let suraNumber = startIndex; suraNumber <= endIndex; suraNumber++) {
-      const suraName = suraNames.find((s) => s.id === suraNumber);
-      newSourates.push({
-        id: suraNumber,
-        name_ar: suraName?.name_ar || `Sourate ${suraNumber}`,
-        name_fr: suraName?.name_fr || `Sourate ${suraNumber}`,
-        verses: suraNumber === 1 ? 7 : 286,
-      });
-    }
-
-    setSourates((prev) => [...prev, ...newSourates]);
-    setFilteredSourates((prev) => [...prev, ...newSourates]);
-    setPage((prev) => prev + 1);
-    setLoading(false);
-  };
-
   useEffect(() => {
-    if (suraNames.length > 0) {
-      loadSourates();
-    }
-  }, [suraNames]);
-
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = sourates.filter((sura) =>
-        sura.name_fr.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-      setFilteredSourates(filtered);
-    } else {
+    if (searchQuery.trim() === '') {
       setFilteredSourates(sourates);
+      return;
     }
+
+    const searchLower = searchQuery.toLowerCase();
+    const filtered = sourates.filter(sura =>
+      sura.name_fr.toLowerCase().includes(searchLower) ||
+      sura.name_ar.includes(searchQuery) ||
+      sura.name_wo?.toLowerCase().includes(searchLower) ||
+      sura.description?.toLowerCase().includes(searchLower) ||
+      sura.id.toString() === searchQuery
+    );
+    setFilteredSourates(filtered);
   }, [searchQuery, sourates]);
 
   const handleSuraPress = (sura) => {
@@ -74,69 +51,149 @@ export default function QuranScreen({ navigation }) {
       suraNumber: sura.id,
       suraNameAr: sura.name_ar,
       suraNameFr: sura.name_fr,
+      suraNameWo: sura.name_wo,
+      description: sura.description,
+      type: sura.type,
+      hasWolofTranslation: sura.hasWolofTranslation
     });
   };
 
-  return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        padding: 16,
-        backgroundColor: theme === 'dark' ? Colors.background : Colors.background,
-      }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          backgroundColor: Colors.gray200,
-          borderRadius: 8,
-          padding: 8,
-          marginBottom: 16,
-        }}>
-        <Search size={20} color={theme === 'dark' ? Colors.white : Colors.black} />
-        <TextInput
-          placeholder="Rechercher une sourate..."
-          placeholderTextColor={theme === 'dark' ? Colors.gray400 : Colors.gray600}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          style={{ flex: 1, marginLeft: 8, color: theme === 'dark' ? Colors.white : Colors.black }}
-        />
-        {searchQuery.length > 0 && (
-          <TouchableOpacity onPress={() => setSearchQuery('')} style={{ padding: 8 }}>
-            <X size={20} color={theme === 'dark' ? Colors.white : Colors.black} />
-          </TouchableOpacity>
-        )}
-      </View>
+  if (loading) {
+    return (
+      <LinearGradient
+        colors={GRADIENTS.primary}
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <CustomLoadingIndicator />
+      </LinearGradient>
+    );
+  }
 
-      <FlatList
-        data={filteredSourates}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => handleSuraPress(item)}
-            style={{
-              padding: 16,
-              marginBottom: 8,
-              borderRadius: 8,
-              backgroundColor: theme === 'dark' ? Colors.gray700 : Colors.gray200,
-            }}>
-            <View>
-              <CustomText
-                size="lg"
-                weight="bold"
-                color={theme === 'dark' ? Colors.white : Colors.black}>
-                {item.id}. {item.name_fr} ({item.name_ar})
-              </CustomText>
-              <CustomText size="sm" color={theme === 'dark' ? Colors.gray400 : Colors.gray600}>
-                {item.verses} versets
-              </CustomText>
-            </View>
-          </TouchableOpacity>
-        )}
-        onEndReached={loadSourates}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <CustomLoadingIndicator /> : null}
-      />
-    </SafeAreaView>
+  return (
+    <LinearGradient colors={GRADIENTS.primary} style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ padding: SPACING.md }}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            marginBottom: SPACING.md
+          }}>
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              style={{ marginRight: SPACING.md }}>
+              <ArrowLeft size={24} color={COLORS.textPrimary} />
+            </TouchableOpacity>
+            <CustomText size="2xl" color={COLORS.textPrimary} weight="bold">
+              Sourates
+            </CustomText>
+          </View>
+
+          <View style={{
+            backgroundColor: COLORS.searchBg,
+            borderRadius: BORDER_RADIUS.md,
+            padding: SPACING.base,
+            marginBottom: SPACING.md,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+            <Search size={20} color={COLORS.textSecondary} style={{ marginRight: SPACING.sm }} />
+            <TextInput
+              placeholder="Rechercher une sourate"
+              placeholderTextColor={COLORS.textSecondary}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              style={{
+                flex: 1,
+                color: COLORS.textPrimary,
+                fontSize: SPACING.base,
+              }}
+            />
+          </View>
+        </View>
+
+        <FlatList
+          data={filteredSourates}
+          keyExtractor={(item) => `surah-${item.id}`}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => handleSuraPress(item)}
+              style={{
+                marginHorizontal: SPACING.md,
+                marginBottom: SPACING.sm,
+              }}>
+              <LinearGradient
+                colors={GRADIENTS.card}
+                style={{
+                  borderRadius: BORDER_RADIUS.md,
+                  overflow: 'hidden',
+                  ...SHADOWS.base,
+                }}>
+                <View style={{
+                  padding: SPACING.md,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                }}>
+                  <View style={{ flex: 1 }}>
+                    <View style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      marginBottom: SPACING.xs
+                    }}>
+                      <View style={{
+                        backgroundColor: COLORS.buttonBg,
+                        paddingHorizontal: SPACING.sm,
+                        paddingVertical: SPACING.xs,
+                        borderRadius: BORDER_RADIUS.base,
+                        marginRight: SPACING.sm,
+                      }}>
+                        <CustomText size="sm" color={COLORS.textPrimary}>
+                          {item.id}
+                        </CustomText>
+                      </View>
+                      <CustomText size="lg" color={COLORS.textPrimary} weight="bold">
+                        {item.name_fr}
+                      </CustomText>
+                      {item.hasWolofTranslation && (
+                        <View style={{
+                          backgroundColor: COLORS.wolofBadge,
+                          paddingHorizontal: SPACING.sm,
+                          paddingVertical: SPACING.xs,
+                          borderRadius: BORDER_RADIUS.base,
+                          marginLeft: SPACING.sm,
+                        }}>
+                          <CustomText size="xs" color={COLORS.primary} weight="bold">
+                            WL
+                          </CustomText>
+                        </View>
+                      )}
+                    </View>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                      <CustomText size="lg" color={COLORS.textPrimary} style={{ marginRight: SPACING.sm }}>
+                        {item.name_ar}
+                      </CustomText>
+                      <CustomText size="xs" color={COLORS.textSecondary}>
+                        {item.verses} Versets, {item.type}
+                      </CustomText>
+                    </View>
+                    {item.name_wo && (
+                      <CustomText size="sm" color={COLORS.textSecondary} style={{ marginTop: SPACING.xs }}>
+                        {item.name_wo}
+                      </CustomText>
+                    )}
+                    {item.description && (
+                      <CustomText size="xs" color={COLORS.textSecondary} style={{ marginTop: SPACING.xs }}>
+                        {item.description}
+                      </CustomText>
+                    )}
+                  </View>
+                </View>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: SPACING.md }}
+        />
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
