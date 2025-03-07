@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { CustomText } from '../components/ui/Typography';
 import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
-import HadithService from '../services/HadithService';
+import HadithService from '../services/hadithService';
 
 export default function HadithSettings({ navigation }) {
   const [fontSize, setFontSize] = useState('normal');

@@ -6,51 +6,27 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { CustomText } from '../components/ui/Typography';
 import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
-import HadithService from 'services/hadithService';
+import HadithService from '../services/hadithService';
 
 const { width } = Dimensions.get('window');
 
 // Données de secours pour les collections
 const FALLBACK_COLLECTIONS = [
   {
-    key: 'bukhari',
-    name: 'Sahih Al-Bukhari',
-    description: 'La collection de hadiths la plus authentique',
-    totalHadith: 7563,
-    languages: ['ar', 'fr', 'en'],
-    available: true
+    name: "Sahih al-Bukhari",
+    numberOfHadith: 7277,
+    totalBooks: 97
   },
   {
-    key: 'muslim',
-    name: 'Sahih Muslim',
-    description: 'La deuxième collection la plus authentique',
-    totalHadith: 7563,
-    languages: ['ar', 'fr', 'en'],
-    available: true
+    name: "Sahih Muslim",
+    numberOfHadith: 7459,
+    totalBooks: 57
   }
 ];
 
-// Données de secours pour le hadith du jour
-const FALLBACK_HADITH = {
-  collection: 'bukhari',
-  hadithNumber: 1,
-  hadithArabic: 'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ',
-  translations: {
-    fr: 'Les actes ne valent que par leurs intentions',
-    en: 'Actions are judged by intentions',
-    ar: 'إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ'
-  },
-  narrator: 'Omar Ibn Al-Khattab',
-  grade: 'Sahih',
-  collectionInfo: {
-    name: 'Sahih Al-Bukhari',
-    key: 'bukhari'
-  }
-};
-
 export default function HadithScreen({ navigation }) {
   const [collections, setCollections] = useState(FALLBACK_COLLECTIONS);
-  const [featuredHadith, setFeaturedHadith] = useState(FALLBACK_HADITH);
+  const [featuredHadith, setFeaturedHadith] = useState(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState(null);
@@ -95,17 +71,26 @@ export default function HadithScreen({ navigation }) {
       let randomHadith = null;
 
       try {
-        collectionsData = await HadithService.getCollections();
+        const response = await HadithService.getCollections();
+        collectionsData = response.collections.map(collection => ({
+          key: collection.name.toLowerCase().replace(/\s/g, '-'),
+          name: collection.name,
+          description: `Collection de ${collection.numberOfHadith} hadiths répartis en ${collection.totalBooks} livres`,
+          totalHadith: collection.numberOfHadith,
+          totalBooks: collection.totalBooks,
+          languages: ['ar', 'fr', 'en'],
+          available: true
+        }));
       } catch (error) {
         console.error('Erreur lors de la récupération des collections:', error);
         collectionsData = FALLBACK_COLLECTIONS;
       }
 
       try {
-        randomHadith = await HadithService.getRandomHadith({ language: selectedLanguage });
+        randomHadith = await HadithService.getRandomHadith(selectedLanguage);
       } catch (error) {
         console.error('Erreur lors de la récupération du hadith aléatoire:', error);
-        randomHadith = FALLBACK_HADITH;
+        randomHadith = null;
       }
 
       setCollections(collectionsData);
@@ -127,15 +112,26 @@ export default function HadithScreen({ navigation }) {
   const handleRefresh = () => {
     setRefreshing(true);
     setRetryCount(0);
-    loadInitialData();
+    refreshFeaturedHadith();
+    setRefreshing(false);
   };
 
   const refreshFeaturedHadith = async () => {
     try {
-      const newHadith = await HadithService.getRandomHadith({ language: selectedLanguage });
-      setFeaturedHadith(newHadith);
+      setLoading(true);
+      const response = await HadithService.getRandomHadith(selectedLanguage);
+      console.log('Nouveau hadith chargé:', response);
+      if (response) {
+        setFeaturedHadith({
+          hadith: response.hadith,
+          narrator: response.narrator,
+          reference: response.reference
+        });
+      }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement du hadith:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -167,6 +163,26 @@ export default function HadithScreen({ navigation }) {
     return favorites.some(fav =>
       fav.collection === hadith.collection && fav.hadithNumber === hadith.hadithNumber
     );
+  };
+
+  const handleCollectionPress = (collection) => {
+    // Mapping des noms de collection vers leurs identifiants
+    const collectionMapping = {
+      "Sahih al-Bukhari": "bukhari",
+      "Sahih Muslim": "muslim",
+      "Sunan an-Nasa'i": "nasai",
+      "Sunan Abi Dawud": "abudawud",
+      "Jami at-Tirmidhi": "tirmidhi",
+      "Sunan Ibn Majah": "ibnmajah"
+    };
+
+    const collectionKey = collectionMapping[collection.name] || collection.key;
+
+    navigation.navigate('CollectionBooks', {
+      collectionKey,
+      collectionName: collection.name,
+      totalBooks: collection.totalBooks
+    });
   };
 
   if (loading) {
@@ -244,8 +260,7 @@ export default function HadithScreen({ navigation }) {
 
             {/* Hadith du jour */}
             {featuredHadith && (
-              <TouchableOpacity
-                onPress={() => navigation.navigate('HadithDetail', { hadith: featuredHadith })}
+              <View
                 style={{
                   backgroundColor: COLORS.cardBackground,
                   borderRadius: BORDER_RADIUS.lg,
@@ -264,7 +279,7 @@ export default function HadithScreen({ navigation }) {
                       Hadith du jour
                     </CustomText>
                     <CustomText size="sm" color={COLORS.textSecondary}>
-                      {featuredHadith.collectionInfo?.name}
+                      {featuredHadith.reference}
                     </CustomText>
                   </View>
                   <View style={{ flexDirection: 'row', gap: SPACING.sm }}>
@@ -293,21 +308,10 @@ export default function HadithScreen({ navigation }) {
                   </View>
                 </View>
                 <CustomText
-                  style={{
-                    marginBottom: SPACING.sm,
-                    textAlign: 'right',
-                    fontFamily: 'arabic',
-                    fontSize: 20,
-                    lineHeight: 36
-                  }}
-                  color={COLORS.textPrimary}>
-                  {featuredHadith.hadithArabic}
-                </CustomText>
-                <CustomText
                   color={COLORS.textSecondary}
                   style={{ marginBottom: SPACING.md }}
                   numberOfLines={3}>
-                  {featuredHadith.translations[selectedLanguage]}
+                  {featuredHadith.hadith}
                 </CustomText>
                 <View style={{
                   flexDirection: 'row',
@@ -320,11 +324,8 @@ export default function HadithScreen({ navigation }) {
                   <CustomText size="sm" color={COLORS.textSecondary}>
                     {featuredHadith.narrator}
                   </CustomText>
-                  <CustomText size="sm" color={COLORS.textSecondary}>
-                    Grade: {featuredHadith.grade}
-                  </CustomText>
                 </View>
-              </TouchableOpacity>
+              </View>
             )}
 
             {/* Collections de Hadiths */}
@@ -335,7 +336,7 @@ export default function HadithScreen({ navigation }) {
               {collections.map((collection) => (
                 <TouchableOpacity
                   key={collection.key}
-                  onPress={() => navigation.navigate('HadithCollection', { collection })}
+                  onPress={() => handleCollectionPress(collection)}
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
@@ -360,31 +361,15 @@ export default function HadithScreen({ navigation }) {
                     <CustomText weight="bold" color={COLORS.textPrimary}>
                       {collection.name}
                     </CustomText>
-                    <CustomText size="sm" color={COLORS.textSecondary}>
-                      {collection.description}
-                    </CustomText>
+
                   </View>
                   <View style={{ alignItems: 'flex-end' }}>
                     <CustomText size="sm" color={COLORS.textSecondary}>
                       {collection.totalHadith} hadiths
                     </CustomText>
-                    <View style={{ flexDirection: 'row', marginTop: SPACING.xs }}>
-                      {collection.languages.map((lang) => (
-                        <View
-                          key={lang}
-                          style={{
-                            backgroundColor: COLORS.buttonBg,
-                            paddingHorizontal: SPACING.xs,
-                            paddingVertical: 2,
-                            borderRadius: BORDER_RADIUS.sm,
-                            marginLeft: 4,
-                          }}>
-                          <CustomText size="xs" color={COLORS.textSecondary}>
-                            {lang.toUpperCase()}
-                          </CustomText>
-                        </View>
-                      ))}
-                    </View>
+                    <CustomText size="xs" color={COLORS.textSecondary}>
+                      {collection.totalBooks} livres
+                    </CustomText>
                   </View>
                 </TouchableOpacity>
               ))}

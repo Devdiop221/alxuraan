@@ -7,7 +7,7 @@ import * as Clipboard from 'expo-clipboard';
 
 import { CustomText } from '../components/ui/Typography';
 import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
-import HadithService from '../services/HadithService';
+import HadithService from '../services/hadithService';
 
 export default function HadithDetail({ route, navigation }) {
   const { hadith: initialHadith } = route.params;

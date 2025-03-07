@@ -1,11 +1,11 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import HadithScreen from '../screens/HadithScreen';
+import DhikrScreen from '../screens/DhikrScreen';
 import SearchHadith from '../screens/SearchHadith';
 import HadithSettings from '../screens/HadithSettings';
 import HadithDetail from '../screens/HadithDetail';
-import HadithCollection from '../screens/HadithCollection';
+import CollectionBooksScreen from '../screens/CollectionBooksScreen';
 
 const Stack = createStackNavigator();
 
@@ -16,11 +16,11 @@ export default function HadithNavigator() {
         headerShown: false,
         cardStyle: { backgroundColor: 'transparent' },
       }}>
-      <Stack.Screen name="HadithHome" component={HadithScreen} />
+      <Stack.Screen name="Dhikr" component={DhikrScreen} />
       <Stack.Screen name="SearchHadith" component={SearchHadith} />
       <Stack.Screen name="HadithSettings" component={HadithSettings} />
       <Stack.Screen name="HadithDetail" component={HadithDetail} />
-      <Stack.Screen name="HadithCollection" component={HadithCollection} />
+      <Stack.Screen name="CollectionBooks" component={CollectionBooksScreen} />
     </Stack.Navigator>
   );
 }

@@ -13,6 +13,7 @@ import FavoritesScreen from '../screens/FavoritesScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 import PlayerMini from '../components/PlayerMini';
 import { usePlayer } from '../context/PlayerContext';
+import HadithNavigator from './HadithNavigator';
 
 const Tab = createBottomTabNavigator();
 const { width } = Dimensions.get('window');
@@ -151,7 +152,7 @@ export default function AppNavigator() {
         <Tab.Screen name="Qaris" component={SurashNavigator} />
         <Tab.Screen name="Coran" component={QuranNavigator} />
         <Tab.Screen name="Prières" component={PrayerTimesScreen} />
-        <Tab.Screen name="Dhikr" component={DhikrScreen} />
+        <Tab.Screen name="Dhikr" component={HadithNavigator} />
         <Tab.Screen name="Favoris" component={FavoritesScreen} />
         <Tab.Screen name="Paramètres" component={SettingsScreen} />
       </Tab.Navigator>
