@@ -20,11 +20,12 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       },
     ],
     [
-      "expo-sensors",
+      'expo-sensors',
       {
-        "motionPermission": "Allow $(PRODUCT_NAME) to access your device motion"
-      }
-    ]
+        motionPermission: 'Allow $(PRODUCT_NAME) to access your device motion',
+      },
+    ],
+    ['expo-notifications'],
   ],
   orientation: 'portrait',
   icon: './assets/icon.png',
@@ -36,6 +37,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   assetBundlePatterns: ['**/*'],
   ios: {
+    bundleIdentifier: 'com.devdiop.alxuraan',
     supportsTablet: true,
     infoPlist: {
       UIBackgroundModes: ['audio'],
