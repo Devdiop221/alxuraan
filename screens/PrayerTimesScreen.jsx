@@ -22,31 +22,31 @@ const PRAYER_CONFIG = {
     name: "Fajr",
     nameFr: "Aube",
     icon: Sunrise,
-    gradient: ['#FF6B6B', '#FF8E53'],
+    gradient: ['#928DAB', '#928DAB'],
   },
   Dhuhr: {
     name: "Dhuhr",
     nameFr: "Midi",
     icon: Sun,
-    gradient: ['#FFD93D', '#FFA41B'],
+    gradient: ['#928DAB', '#928DAB'],
   },
   Asr: {
     name: "Asr",
     nameFr: "Après-midi",
     icon: Sun,
-    gradient: ['#4FACFE', '#00F2FE'],
+    gradient: ['#928DAB', '#928DAB'],
   },
   Maghrib: {
     name: "Maghrib",
     nameFr: "Coucher du soleil",
     icon: Sunset,
-    gradient: ['#FF6B6B', '#FF8E53'],
+    gradient: ['#928DAB', '#928DAB'],
   },
   Isha: {
     name: "Isha",
     nameFr: "Nuit",
     icon: Moon,
-    gradient: ['#4FACFE', '#00F2FE'],
+    gradient: ['#928DAB', '#928DAB'],
   },
 };
 

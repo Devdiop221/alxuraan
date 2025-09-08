@@ -1,12 +1,11 @@
 export const COLORS = {
   // Couleurs principales
-  primary: '#2E8B57', // Vert forêt
-  secondary: '#20B2AA', // Turquoise clair
+  primary: '#1F1A2C', // Vert forêt
+  secondary: '#928DAB', // Turquoise clair
   accent: '#98FB98', // Vert pâle
 
   // Arrière-plans
   background: '#1A1A1A',
-  cardBackground: 'rgba(46, 139, 87, 0.3)',
   searchBg: 'rgba(255, 255, 255, 0.15)',
   buttonBg: 'rgba(152, 251, 152, 0.3)',
 
@@ -29,8 +28,8 @@ export const COLORS = {
   wolofBadge: '#FFD700',
 
   // Gradients
-  gradientStart: '#2E8B57',
-  gradientEnd: '#20B2AA',
+  gradientStart: '#1F1A2C',
+  gradientEnd: '#928DAB',
 };
 
 export const TYPOGRAPHY = {
@@ -96,7 +95,7 @@ export const SHADOWS = {
 
 export const GRADIENTS = {
   primary: [COLORS.gradientStart, COLORS.gradientEnd],
-  card: [COLORS.cardBackground, 'rgba(46, 139, 87, 0.1)'],
+  card: ['#928DAB', '#928DAB'],
 };
 
 export const LAYOUT = {

@@ -21,24 +21,25 @@ const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 85 : 65;
 const TAB_BAR_PADDING_BOTTOM = Platform.OS === 'ios' ? 25 : 10;
 
 const TAB_COLORS = {
-  Qaris: ['#FF6B6B', '#FF8E53'],
-  Coran: ['#4FACFE', '#00F2FE'],
-  Prières: ['#43E97B', '#38F9D7'],
-  Dhikr: ['#FA709A', '#FEE140'],
-  Favoris: ['#6E45E2', '#89D4CF'],
-  Paramètres: ['#764BA2', '#667EEA'],
+  Qaris: ['#928DAB', '#928DAB'],
+  Coran: ['#928DAB', '#928DAB'],
+  Prières: ['#928DAB', '#928DAB'],
+  Dhikr: ['#928DAB', '#928DAB'],
+  Favoris: ['#928DAB', '#928DAB'],
+  Paramètres: ['#928DAB', '#928DAB'],
 };
 
 const TabBar = ({ state, descriptors, navigation }) => {
   return (
-    <View style={{
-      position: 'absolute',
-      bottom: SPACING.md,
-      left: SPACING.md,
-      right: SPACING.md,
-    }}>
+    <View
+      style={{
+        position: 'absolute',
+        bottom: SPACING.md,
+        left: SPACING.md,
+        right: SPACING.md,
+      }}>
       <LinearGradient
-        colors={['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)']}
+        colors={['#1F1A2C', '#1F1A2C']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
@@ -46,9 +47,9 @@ const TabBar = ({ state, descriptors, navigation }) => {
           height: TAB_BAR_HEIGHT,
           borderRadius: BORDER_RADIUS.xl,
           padding: SPACING.xs,
-          backgroundColor: 'rgba(255,255,255,0.05)',
+          backgroundColor: '#1F1A2C',
           borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.1)',
+          borderColor: '#1F1A2C',
           ...SHADOWS.large,
         }}>
         {state.routes.map((route, index) => {
@@ -104,12 +105,13 @@ const TabBar = ({ state, descriptors, navigation }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-              <View style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 50,
-                height: 50,
-              }}>
+              <View
+                style={{
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: 50,
+                  height: 50,
+                }}>
                 {isFocused ? (
                   <LinearGradient
                     colors={gradientColors}
