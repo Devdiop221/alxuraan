@@ -1,6 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 import React, { useState, useEffect, useRef } from 'react';
 import { Alert, SafeAreaView, View, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';

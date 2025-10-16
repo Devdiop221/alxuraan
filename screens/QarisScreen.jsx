@@ -7,46 +7,9 @@ import axios from 'axios';
 import { CustomLoadingIndicator } from '../components/ui/LoadingIndicator';
 import { CustomText } from '../components/ui/Typography';
 import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
+import { translateReciterName, searchReciters } from '../utils/reciterNames';
 
 const { width } = Dimensions.get('window');
-
-// Fonction pour normaliser le texte (enlever les accents et mettre en minuscule)
-const normalizeText = (text) => {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-};
-
-// Fonction pour calculer la pertinence d'un résultat
-const calculateRelevance = (item, searchTerms) => {
-  let score = 0;
-  const normalizedName = normalizeText(item.name);
-  const normalizedLanguage = normalizeText(item.language);
-
-  searchTerms.forEach(term => {
-    // Correspondance exacte du nom
-    if (normalizedName.includes(term)) {
-      score += 3;
-      // Bonus si le terme est au début du nom
-      if (normalizedName.startsWith(term)) {
-        score += 2;
-      }
-    }
-
-    // Correspondance de la langue
-    if (normalizedLanguage.includes(term)) {
-      score += 2;
-    }
-
-    // Correspondance partielle du nom
-    if (term.length > 2 && normalizedName.split(' ').some(word => word.startsWith(term))) {
-      score += 1;
-    }
-  });
-
-  return score;
-};
 
 export default function QarisScreen({ navigation }) {
   const [qaris, setQaris] = useState([]);
@@ -61,11 +24,89 @@ export default function QarisScreen({ navigation }) {
   useEffect(() => {
     const fetchQaris = async () => {
       try {
-        const response = await axios.get(
-          'https://raw.githubusercontent.com/islamic-network/cdn/master/info/cdn_surah_audio.json'
-        );
-        setQaris(response.data);
-        setFilteredQaris(response.data);
+        let response;
+        let transformedData = [];
+
+        try {
+          // Essayer d'abord l'API MP3Quran
+          response = await axios.get('https://mp3quran.net/api/v3/reciters');
+
+          if (response.data && response.data.reciters) {
+            // Transformer les données pour correspondre au format attendu
+            transformedData = response.data.reciters.map(reciter => ({
+              identifier: reciter.id.toString(),
+              name: translateReciterName(reciter.name), // Traduire le nom
+              originalName: reciter.name, // Garder le nom original
+              language: 'Arabe',
+              moshaf: reciter.moshaf || []
+            }));
+          }
+        } catch (mp3QuranError) {
+          console.log('MP3Quran API failed, trying fallback...');
+
+          // Fallback vers une liste statique de récitateurs populaires
+          const fallbackReciters = [
+            {
+              identifier: '1',
+              originalName: 'عبد الباسط عبد الصمد',
+              language: 'Arabe',
+              moshaf: [{
+                id: 1,
+                name: 'مرتل',
+                server: 'https://server8.mp3quran.net/abd_basit/Alafasy_128_kbps/',
+              }]
+            },
+            {
+              identifier: '2',
+              originalName: 'مشاري بن راشد العفاسي',
+              language: 'Arabe',
+              moshaf: [{
+                id: 2,
+                name: 'مرتل',
+                server: 'https://server8.mp3quran.net/afs/',
+              }]
+            },
+            {
+              identifier: '3',
+              originalName: 'ماهر المعيقلي',
+              language: 'Arabe',
+              moshaf: [{
+                id: 3,
+                name: 'مرتل',
+                server: 'https://server12.mp3quran.net/maher/',
+              }]
+            },
+            {
+              identifier: '4',
+              originalName: 'سعد الغامدي',
+              language: 'Arabe',
+              moshaf: [{
+                id: 4,
+                name: 'مرتل',
+                server: 'https://server7.mp3quran.net/s_gmd/',
+              }]
+            },
+            {
+              identifier: '5',
+              originalName: 'عبد الرحمن السديس',
+              language: 'Arabe',
+              moshaf: [{
+                id: 5,
+                name: 'مرتل',
+                server: 'https://server11.mp3quran.net/sds/',
+              }]
+            }
+          ];
+
+          // Traduire les noms du fallback
+          transformedData = fallbackReciters.map(reciter => ({
+            ...reciter,
+            name: translateReciterName(reciter.originalName)
+          }));
+        }
+
+        setQaris(transformedData);
+        setFilteredQaris(transformedData);
         setLoading(false);
 
         Animated.parallel([
@@ -95,35 +136,40 @@ export default function QarisScreen({ navigation }) {
   }, []);
 
   const handleSearch = (text) => {
-    setSearchQuery(text);
+    try {
+      setSearchQuery(text);
 
-    if (!text.trim()) {
-      setFilteredQaris(qaris);
-      return;
+      if (!text || !text.trim()) {
+        setFilteredQaris(qaris);
+        return;
+      }
+
+      // Vérifier que qaris est un tableau valide
+      if (!qaris || !Array.isArray(qaris)) {
+        console.warn('Qaris non valide pour la recherche');
+        setFilteredQaris([]);
+        return;
+      }
+
+      // Utiliser la fonction de recherche améliorée
+      const results = searchReciters(qaris, text);
+      setFilteredQaris(results || []);
+
+    } catch (error) {
+      console.error('Erreur lors de la recherche:', error);
+      // En cas d'erreur, afficher tous les récitateurs
+      setFilteredQaris(qaris || []);
     }
-
-    // Diviser la recherche en termes et les normaliser
-    const searchTerms = normalizeText(text)
-      .split(' ')
-      .filter(term => term.length > 0);
-
-    // Filtrer et trier les résultats par pertinence
-    const results = qaris
-      .map(qari => ({
-        ...qari,
-        relevance: calculateRelevance(qari, searchTerms)
-      }))
-      .filter(qari => qari.relevance > 0)
-      .sort((a, b) => b.relevance - a.relevance)
-      .map(({ relevance, ...qari }) => qari);
-
-    setFilteredQaris(results);
   };
 
   const clearSearch = () => {
-    setSearchQuery('');
-    setFilteredQaris(qaris);
-    searchInputRef.current?.focus();
+    try {
+      setSearchQuery('');
+      setFilteredQaris(qaris || []);
+      searchInputRef.current?.focus();
+    } catch (error) {
+      console.error('Erreur lors du nettoyage de recherche:', error);
+    }
   };
 
   const renderHeader = () => (
@@ -244,7 +290,10 @@ export default function QarisScreen({ navigation }) {
                 }]
               }}>
               <TouchableOpacity
-                onPress={() => navigation.navigate('Surahs', { edition: item.identifier })}
+                onPress={() => navigation.navigate('ReciterRecitationsSimple', {
+                  reciter: item,
+                  apiSource: 'mp3quran'
+                })}
                 style={{
                   transform: [{ scale: 0.98 }],
                 }}>

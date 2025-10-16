@@ -21,7 +21,7 @@ const TAB_BAR_HEIGHT = Platform.OS === 'ios' ? 85 : 65;
 const TAB_BAR_PADDING_BOTTOM = Platform.OS === 'ios' ? 25 : 10;
 
 const TAB_COLORS = {
-  Qaris: ['#928DAB', '#928DAB'],
+  Récitateurs: ['#928DAB', '#928DAB'],
   Coran: ['#928DAB', '#928DAB'],
   Prières: ['#928DAB', '#928DAB'],
   Dhikr: ['#928DAB', '#928DAB'],
@@ -74,7 +74,7 @@ const TabBar = ({ state, descriptors, navigation }) => {
 
           let Icon;
           switch (route.name) {
-            case 'Qaris':
+            case 'Récitateurs':
               Icon = Radio;
               break;
             case 'Coran':
@@ -151,7 +151,7 @@ export default function AppNavigator() {
           headerShown: false,
         }}
       >
-        <Tab.Screen name="Qaris" component={SurashNavigator} />
+        <Tab.Screen name="Récitateurs" component={SurashNavigator} />
         <Tab.Screen name="Coran" component={QuranNavigator} />
         <Tab.Screen name="Prières" component={PrayerTimesScreen} />
         <Tab.Screen name="Dhikr" component={HadithNavigator} />

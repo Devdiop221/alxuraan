@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 
 // Service pour gérer les adhans
 export const adhanService = {
@@ -9,13 +9,13 @@ export const adhanService = {
         id: 1,
         name: 'Adhan Makkah',
         source: require('../assets/adhans/adhan_makkah.mp3'),
-        muezzin: 'Sheikh Ali Ahmed Mulla'
+        muezzin: 'Sheikh Ali Ahmed Mulla',
       },
       {
         id: 2,
         name: 'Adhan Madinah',
         source: require('../assets/adhans/adhan_madinah.mp3'),
-        muezzin: 'Sheikh Essam Bukhari'
+        muezzin: 'Sheikh Essam Bukhari',
       },
       // Ajoutez d'autres adhans selon vos besoins
     ];
@@ -44,5 +44,5 @@ export const adhanService = {
         throw error;
       }
     }
-  }
+  },
 };

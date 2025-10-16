@@ -4,6 +4,7 @@ import { COLORS, SPACING, BORDER_RADIUS, SHADOWS } from '../components/ui/Theme'
 import PlayerScreen from '../screens/PlayerScreen';
 import QarisScreen from '../screens/QarisScreen';
 import SurahsScreen from '../screens/SurahsScreen';
+import ReciterRecitationsScreenSimple from '../screens/ReciterRecitationsScreenSimple';
 
 const Stack = createStackNavigator();
 
@@ -64,6 +65,10 @@ export default function SurashNavigator() {
       <Stack.Screen
         name="Player"
         component={PlayerScreen}
+      />
+      <Stack.Screen
+        name="ReciterRecitationsSimple"
+        component={ReciterRecitationsScreenSimple}
       />
     </Stack.Navigator>
   );

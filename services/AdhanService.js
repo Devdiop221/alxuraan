@@ -1,4 +1,4 @@
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 
 // Liste des adhans disponibles avec leurs URLs
 const ADHANS = {

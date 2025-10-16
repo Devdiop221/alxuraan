@@ -16,7 +16,7 @@ export default function HadithNavigator() {
         headerShown: false,
         cardStyle: { backgroundColor: 'transparent' },
       }}>
-      <Stack.Screen name="Dhikr" component={DhikrScreen} />
+      <Stack.Screen name="HadithHome" component={DhikrScreen} />
       <Stack.Screen name="SearchHadith" component={SearchHadith} />
       <Stack.Screen name="HadithSettings" component={HadithSettings} />
       <Stack.Screen name="HadithDetail" component={HadithDetail} />

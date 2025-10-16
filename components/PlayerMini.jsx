@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Platform } from 'react-native';
 import { Play, Pause, Volume2, VolumeX, FastForward, X } from 'lucide-react-native';
 import Slider from '@react-native-community/slider';
-import { Audio } from 'expo-av';
+import { Audio } from 'expo-audio';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { CustomText } from './ui/Typography';

@@ -14,10 +14,10 @@ const getHeaders = () => {
   };
 };
 
-// Utility function to make API requests
+// Utility function to make API requests with robust error handling
 const apiRequest = async (endpoint, options = {}) => {
   try {
-    // Check for cached data
+    // Check for cached data first
     const cacheKey = `@hadith_cache_${endpoint}`;
     const cachedData = await AsyncStorage.getItem(cacheKey);
 
@@ -26,17 +26,38 @@ const apiRequest = async (endpoint, options = {}) => {
       const parsedData = JSON.parse(cachedData);
       // Check if cache is still valid (less than 24 hours old)
       if (parsedData.timestamp && Date.now() - parsedData.timestamp < 24 * 60 * 60 * 1000) {
+        console.log('📦 Utilisation du cache pour:', endpoint);
         return parsedData.data;
       }
     }
 
-    // Make the API request
+    // Make the API request with timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 secondes timeout
+
     const response = await fetch(`${BASE_URL}${endpoint}`, {
       headers: getHeaders(),
+      signal: controller.signal,
       ...options,
     });
 
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
+      // Gestion spécifique des erreurs 504 (Gateway Timeout)
+      if (response.status === 504) {
+        console.warn('⚠️ Timeout du serveur (504), utilisation du cache ou fallback');
+
+        // Essayer d'utiliser un cache expiré si disponible
+        if (cachedData) {
+          const parsedData = JSON.parse(cachedData);
+          console.log('📦 Utilisation du cache expiré pour:', endpoint);
+          return parsedData.data;
+        }
+
+        throw new Error(`Server timeout (504) - Service temporairement indisponible`);
+      }
+
       throw new Error(`API request failed with status ${response.status}`);
     }
 
@@ -49,12 +70,83 @@ const apiRequest = async (endpoint, options = {}) => {
     };
     await AsyncStorage.setItem(cacheKey, JSON.stringify(cacheData));
 
+    console.log('✅ Données récupérées et mises en cache pour:', endpoint);
+
     return data;
   } catch (error) {
     console.error(`Error in API request to ${endpoint}:`, error);
+
+    // En cas d'erreur, essayer de retourner des données de fallback
+    if (endpoint === '/collection') {
+      console.log('🔄 Utilisation des données de fallback pour les collections');
+      return getFallbackCollections();
+    }
+
+    if (endpoint.includes('/random')) {
+      console.log('🔄 Utilisation du hadith de fallback');
+      return getFallbackRandomHadith();
+    }
+
     throw error;
   }
 };
+
+// Données de fallback pour les collections
+const getFallbackCollections = () => ({
+  collections: [
+    {
+      name: "Sahih al-Bukhari",
+      numberOfHadith: 7277,
+      totalBooks: 97,
+      key: "sahih-al-bukhari"
+    },
+    {
+      name: "Sahih Muslim",
+      numberOfHadith: 7459,
+      totalBooks: 57,
+      key: "sahih-muslim"
+    },
+    {
+      name: "Sunan Abu Dawood",
+      numberOfHadith: 5274,
+      totalBooks: 43,
+      key: "sunan-abu-dawood"
+    },
+    {
+      name: "Jami at-Tirmidhi",
+      numberOfHadith: 3956,
+      totalBooks: 49,
+      key: "jami-at-tirmidhi"
+    },
+    {
+      name: "Sunan an-Nasa'i",
+      numberOfHadith: 5761,
+      totalBooks: 51,
+      key: "sunan-an-nasai"
+    },
+    {
+      name: "Sunan Ibn Majah",
+      numberOfHadith: 4341,
+      totalBooks: 37,
+      key: "sunan-ibn-majah"
+    }
+  ]
+});
+
+// Hadith de fallback
+const getFallbackRandomHadith = () => ({
+  hadith: {
+    id: "fallback-1",
+    text: "Le Prophète (que la paix et les bénédictions d'Allah soient sur lui) a dit : « Les actions ne valent que par les intentions, et chacun n'aura que ce qu'il a eu l'intention de faire. »",
+    reference: "Sahih al-Bukhari 1, Sahih Muslim 1907",
+    collection: "Sahih al-Bukhari",
+    book: "Livre de la Révélation",
+    chapter: "Comment la révélation a commencé",
+    narrator: "Umar ibn al-Khattab",
+    grade: "Sahih (Authentique)",
+    language: "fr"
+  }
+});
 
 // Hadith Service with RapidAPI integration
 const HadithService = {

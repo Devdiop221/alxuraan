@@ -13,14 +13,32 @@ const { width } = Dimensions.get('window');
 // Données de secours pour les collections
 const FALLBACK_COLLECTIONS = [
   {
+    key: "sahih-al-bukhari",
     name: "Sahih al-Bukhari",
     numberOfHadith: 7277,
-    totalBooks: 97
+    totalBooks: 97,
+    description: "Collection de 7277 hadiths répartis en 97 livres"
   },
   {
+    key: "sahih-muslim",
     name: "Sahih Muslim",
     numberOfHadith: 7459,
-    totalBooks: 57
+    totalBooks: 57,
+    description: "Collection de 7459 hadiths répartis en 57 livres"
+  },
+  {
+    key: "sunan-abu-dawood",
+    name: "Sunan Abu Dawood",
+    numberOfHadith: 5274,
+    totalBooks: 43,
+    description: "Collection de 5274 hadiths répartis en 43 livres"
+  },
+  {
+    key: "jami-at-tirmidhi",
+    name: "Jami at-Tirmidhi",
+    numberOfHadith: 3956,
+    totalBooks: 49,
+    description: "Collection de 3956 hadiths répartis en 49 livres"
   }
 ];
 
@@ -72,12 +90,12 @@ export default function HadithScreen({ navigation }) {
 
       try {
         const response = await HadithService.getCollections();
-        collectionsData = response.collections.map(collection => ({
-          key: collection.name.toLowerCase().replace(/\s/g, '-'),
-          name: collection.name,
-          description: `Collection de ${collection.numberOfHadith} hadiths répartis en ${collection.totalBooks} livres`,
-          totalHadith: collection.numberOfHadith,
-          totalBooks: collection.totalBooks,
+        collectionsData = response.collections.map((collection, index) => ({
+          key: collection.key || collection.name?.toLowerCase().replace(/\s/g, '-') || `collection-${index}`,
+          name: collection.name || 'Collection Inconnue',
+          description: `Collection de ${collection.numberOfHadith || 0} hadiths répartis en ${collection.totalBooks || 0} livres`,
+          totalHadith: collection.numberOfHadith || 0,
+          totalBooks: collection.totalBooks || 0,
           languages: ['ar', 'fr', 'en'],
           available: true
         }));
@@ -87,7 +105,20 @@ export default function HadithScreen({ navigation }) {
       }
 
       try {
-        randomHadith = await HadithService.getRandomHadith(selectedLanguage);
+        const hadithResponse = await HadithService.getRandomHadith(selectedLanguage);
+        console.log('Réponse hadith reçue:', hadithResponse);
+
+        // Normaliser la structure des données
+        if (hadithResponse && hadithResponse.hadith) {
+          // Structure du fallback: { hadith: { ... } }
+          randomHadith = hadithResponse.hadith;
+        } else if (hadithResponse && hadithResponse.text) {
+          // Structure directe de l'API: { text: "...", ... }
+          randomHadith = hadithResponse;
+        } else {
+          console.warn('Structure de hadith non reconnue:', hadithResponse);
+          randomHadith = null;
+        }
       } catch (error) {
         console.error('Erreur lors de la récupération du hadith aléatoire:', error);
         randomHadith = null;
@@ -119,14 +150,24 @@ export default function HadithScreen({ navigation }) {
   const refreshFeaturedHadith = async () => {
     try {
       setLoading(true);
-      const response = await HadithService.getRandomHadith(selectedLanguage);
-      console.log('Nouveau hadith chargé:', response);
-      if (response) {
-        setFeaturedHadith({
-          hadith: response.hadith,
-          narrator: response.narrator,
-          reference: response.reference
-        });
+      const hadithResponse = await HadithService.getRandomHadith(selectedLanguage);
+      console.log('Nouveau hadith chargé:', hadithResponse);
+
+      if (hadithResponse) {
+        let normalizedHadith = null;
+
+        // Normaliser la structure des données
+        if (hadithResponse.hadith) {
+          // Structure du fallback: { hadith: { ... } }
+          normalizedHadith = hadithResponse.hadith;
+        } else if (hadithResponse.text) {
+          // Structure directe de l'API: { text: "...", ... }
+          normalizedHadith = hadithResponse;
+        }
+
+        if (normalizedHadith) {
+          setFeaturedHadith(normalizedHadith);
+        }
       }
     } catch (error) {
       console.error('Erreur lors du rafraîchissement du hadith:', error);
@@ -311,7 +352,7 @@ export default function HadithScreen({ navigation }) {
                   color={COLORS.textSecondary}
                   style={{ marginBottom: SPACING.md }}
                   numberOfLines={3}>
-                  {featuredHadith.hadith}
+                  {featuredHadith.text || featuredHadith.hadith || 'Texte du hadith non disponible'}
                 </CustomText>
                 <View style={{
                   flexDirection: 'row',
