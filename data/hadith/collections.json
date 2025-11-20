@@ -1,0 +1,371 @@
+{
+  "abudawud": {
+    "name": "Sunan Abu Dawud",
+    "collection": [
+      {
+        "name": "ara-abudawud",
+        "book": "abudawud",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-abudawud.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-abudawud.min.json"
+      },
+      {
+        "name": "eng-abudawud",
+        "book": "abudawud",
+        "author": "Unknown",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-abudawud.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-abudawud.min.json"
+      },
+      {
+        "name": "fra-abudawud",
+        "book": "abudawud",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-abudawud.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-abudawud.min.json"
+      }
+    ]
+  },
+  "bukhari": {
+    "name": "Sahih al Bukhari",
+    "collection": [
+      {
+        "name": "ara-bukhari",
+        "book": "bukhari",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-bukhari.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-bukhari.min.json"
+      },
+      {
+        "name": "eng-bukhari",
+        "book": "bukhari",
+        "author": "Muhsin Khan",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-bukhari.min.json"
+      },
+      {
+        "name": "fra-bukhari",
+        "book": "bukhari",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-bukhari.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-bukhari.min.json"
+      }
+    ]
+  },
+  "dehlawi": {
+    "name": "Forty Hadith of Shah Waliullah Dehlawi",
+    "collection": [
+      {
+        "name": "ara-dehlawi",
+        "book": "dehlawi",
+        "author": "Shah Waliullah Dehlawi",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-dehlawi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-dehlawi.min.json"
+      },
+      {
+        "name": "eng-dehlawi",
+        "book": "dehlawi",
+        "author": "Shah Waliullah Dehlawi",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-dehlawi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-dehlawi.min.json"
+      },
+      {
+        "name": "fra-dehlawi",
+        "book": "dehlawi",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-dehlawi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-dehlawi.min.json"
+      }
+    ]
+  },
+  "ibnmajah": {
+    "name": "Sunan Ibn Majah",
+    "collection": [
+      {
+        "name": "ara-ibnmajah",
+        "book": "ibnmajah",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-ibnmajah.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-ibnmajah.min.json"
+      },
+      {
+        "name": "eng-ibnmajah",
+        "book": "ibnmajah",
+        "author": "Unknown",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-ibnmajah.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-ibnmajah.min.json"
+      },
+      {
+        "name": "fra-ibnmajah",
+        "book": "ibnmajah",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-ibnmajah.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-ibnmajah.min.json"
+      }
+    ]
+  },
+  "malik": {
+    "name": "Muwatta Malik",
+    "collection": [
+      {
+        "name": "ara-malik",
+        "book": "malik",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-malik.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-malik.min.json"
+      },
+      {
+        "name": "eng-malik",
+        "book": "malik",
+        "author": "Unknown",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-malik.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-malik.min.json"
+      },
+      {
+        "name": "fra-malik",
+        "book": "malik",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-malik.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-malik.min.json"
+      }
+    ]
+  },
+  "muslim": {
+    "name": "Sahih Muslim",
+    "collection": [
+      {
+        "name": "ara-muslim",
+        "book": "muslim",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-muslim.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-muslim.min.json"
+      },
+      {
+        "name": "eng-muslim",
+        "book": "muslim",
+        "author": "Abdul Hamid Siddiqui",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-muslim.min.json"
+      },
+      {
+        "name": "fra-muslim",
+        "book": "muslim",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-muslim.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-muslim.min.json"
+      }
+    ]
+  },
+  "nasai": {
+    "name": "Sunan an Nasai",
+    "collection": [
+      {
+        "name": "ara-nasai",
+        "book": "nasai",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-nasai.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-nasai.min.json"
+      },
+      {
+        "name": "eng-nasai",
+        "book": "nasai",
+        "author": "Unknown",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nasai.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nasai.min.json"
+      },
+      {
+        "name": "fra-nasai",
+        "book": "nasai",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-nasai.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-nasai.min.json"
+      }
+    ]
+  },
+  "nawawi": {
+    "name": "Forty Hadith of an-Nawawi",
+    "collection": [
+      {
+        "name": "ara-nawawi",
+        "book": "nawawi",
+        "author": "Imam Nawawi",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-nawawi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-nawawi.min.json"
+      },
+      {
+        "name": "eng-nawawi",
+        "book": "nawawi",
+        "author": "Imam Nawawi",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nawawi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-nawawi.min.json"
+      },
+      {
+        "name": "fra-nawawi",
+        "book": "nawawi",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-nawawi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-nawawi.min.json"
+      }
+    ]
+  },
+  "qudsi": {
+    "name": "Forty Hadith Qudsi",
+    "collection": [
+      {
+        "name": "ara-qudsi",
+        "book": "qudsi",
+        "author": "Unknown",
+        "language": "Arabic",
+        "has_sections": true,
+        "direction": "rtl",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-qudsi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/ara-qudsi.min.json"
+      },
+      {
+        "name": "eng-qudsi",
+        "book": "qudsi",
+        "author": "Unknown",
+        "language": "English",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-qudsi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/eng-qudsi.min.json"
+      },
+      {
+        "name": "fra-qudsi",
+        "book": "qudsi",
+        "author": "Unknown",
+        "language": "French",
+        "has_sections": true,
+        "direction": "ltr",
+        "source": "",
+        "comments": "",
+        "link": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-qudsi.json",
+        "linkmin": "https://cdn.jsdelivr.net/gh/fawazahmed0/hadith-api@1/editions/fra-qudsi.min.json"
+      }
+    ]
+  }
+}

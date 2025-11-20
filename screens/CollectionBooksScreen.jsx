@@ -24,14 +24,9 @@ export default function CollectionBooksScreen({ route, navigation }) {
       const response = await HadithService.getCollectionChapters(collectionKey);
       console.log('Livres chargés:', response);
 
-      if (response && response[collectionKey]) {
-        // Transformer la structure des données
-        const booksArray = Object.entries(response[collectionKey]).map(([name, data]) => ({
-          id: name,
-          name: name,
-          numberOfHadith: data.numberOfHadith
-        }));
-        setBooks(booksArray);
+      if (response && response.books) {
+        // La réponse a la structure: { books: [...], collection: {...} }
+        setBooks(response.books);
       } else {
         console.log('Format de réponse invalide:', response);
         setError('Format de réponse invalide');

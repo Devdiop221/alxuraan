@@ -320,7 +320,10 @@ export default function HadithScreen({ navigation }) {
                       Hadith du jour
                     </CustomText>
                     <CustomText size="sm" color={COLORS.textSecondary}>
-                      {featuredHadith.reference}
+                      {featuredHadith.reference ?
+                        `Livre ${featuredHadith.reference.book}, Hadith ${featuredHadith.reference.hadith}` :
+                        featuredHadith.collection || 'Collection inconnue'
+                      }
                     </CustomText>
                   </View>
                   <View style={{ flexDirection: 'row', gap: SPACING.sm }}>

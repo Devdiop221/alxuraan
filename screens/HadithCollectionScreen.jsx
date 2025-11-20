@@ -6,10 +6,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { CustomText } from '../components/ui/Typography';
 import { COLORS, SPACING, BORDER_RADIUS, GRADIENTS, SHADOWS } from '../components/ui/Theme';
-import HadithService from '../services/HadithService';
+import HadithService from '../services/hadithService';
 
 export default function HadithCollectionScreen({ route, navigation }) {
-  const { collection } = route.params;
+  const { collectionKey, bookId, bookName, collection } = route.params;
+  // Support pour les deux formats de paramètres
+  const actualCollectionKey = collectionKey || collection;
+  const actualBookId = bookId !== undefined ? bookId : 1;
+  const actualBookName = bookName || 'Chapitre';
+
   const [hadiths, setHadiths] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -42,7 +47,7 @@ export default function HadithCollectionScreen({ route, navigation }) {
         pageNumber = 1;
       }
 
-      const response = await HadithService.getHadithsByChapter(collection, 1, {
+      const response = await HadithService.getHadithsByChapter(actualCollectionKey, actualBookId, {
         language: selectedLanguage,
         page: pageNumber,
         limit: 20
@@ -115,7 +120,7 @@ export default function HadithCollectionScreen({ route, navigation }) {
       <CustomText
         color={COLORS.textPrimary}
         numberOfLines={3}
-        style={{ marginBottom: SPACING.xs }}>
+        style={{ marginBottom: SPACING.xs, textAlign: 'right' }}>
         {item.hadithArabic}
       </CustomText>
 
@@ -123,7 +128,7 @@ export default function HadithCollectionScreen({ route, navigation }) {
         color={COLORS.textSecondary}
         size="sm"
         numberOfLines={2}>
-        {item.hadithEnglish}
+        {item.hadithFrench || item.text}
       </CustomText>
     </TouchableOpacity>
   );
@@ -163,7 +168,7 @@ export default function HadithCollectionScreen({ route, navigation }) {
               <ArrowLeft size={24} color={COLORS.textPrimary} />
             </TouchableOpacity>
             <CustomText size="xl" weight="bold" color={COLORS.textPrimary}>
-              {collection}
+              {actualBookName}
             </CustomText>
           </View>
         </View>
